@@ -399,18 +399,11 @@ const LoginPage = () => {
             <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, #d4af37, transparent)' }} />
           </div>
 
-          {/* Info rows */}
-          <div style={{ width: '100%' }}>
-            {[
-              { icon: <IconPin />, text: <span><strong style={{ color: '#2a1a0a' }}>{TrsutData.address}</strong></span> },
-              { icon: <IconPhone />, text: <span><strong style={{ color: '#2a1a0a' }}>{TrsutData.contact}</strong></span> },
-              { icon: <IconPerson />, text: <span>अध्यक्ष: <strong style={{ color: '#2a1a0a' }}>{TrsutData.trustPresident}</strong></span> },
-            ].map((row, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 12, color: '#6b5a3e', lineHeight: 1.5, marginBottom: 8 }}>
-                <span style={{ flexShrink: 0, marginTop: 1, color: '#EA1F25' }}>{row.icon}</span>
-                {row.text}
-              </div>
-            ))}
+          {/* Tagline / Subtitle */}
+          <div style={{ textAlign: 'center', marginTop: 8 }}>
+            <div style={{ fontSize: 12, color: '#6b5a3e', fontStyle: 'italic' }}>
+              सेवा • सहयोग • संस्कार • विश्वास
+            </div>
           </div>
 
         </div>
@@ -428,7 +421,7 @@ const LoginPage = () => {
                   {stepLabels[step - 1]}
                 </div>
                 <div style={{ fontSize: '1.4rem', color: '#fff', fontWeight: 600, fontFamily: "'Playfair Display', serif" }}>
-                  Welcome Back, <span style={{ color: '#d4af37' }}>User</span>
+                  Welcome Back, <span style={{ color: '#d4af37' }}>Admin</span>
                 </div>
                 <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
                   {[1, 2, 3].map(d => <div key={d} style={getDotStyle(d)} />)}
