@@ -362,8 +362,7 @@ const LoginPage = () => {
         .lp-step { animation: lp-fadeIn 0.3s ease; }
         .lp-btn:hover { opacity: 0.88 !important; }
         .lp-btn:active { transform: scale(0.99); }
-        .lp-mandala::before { content:''; position:absolute; inset:6px; border-radius:50%; border:1px dashed rgba(212,175,55,0.5); }
-        .lp-mandala::after  { content:''; position:absolute; inset:14px; border-radius:50%; border:1px solid rgba(212,175,55,0.25); }
+        .lp-mandala { box-shadow: 0 6px 20px rgba(212,175,55,0.25); }
         @media (max-width: 700px) { .lp-left { display: none !important; } }
       `}</style>
 
@@ -380,10 +379,8 @@ const LoginPage = () => {
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, #EA1F25, #d4af37, #1a0f5e)' }} />
 
           {/* Emblem */}
-          <div className="lp-mandala" style={{ width: 176, height: 176, borderRadius: '50%', border: '2px solid #d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '1.5rem', background: '#fff' }}>
-            <div style={{ width: 140, height: 140, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
-              <img src="/logo.png" alt="Veer Balaji Foundation Logo" style={{ width: '100%', height: "100%", objectFit: 'contain' }} />
-            </div>
+          <div className="lp-mandala" style={{ width: 180, height: 180, borderRadius: '50%', border: '3px solid #d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '1.5rem', background: '#ffffff', overflow: 'hidden' }}>
+            <img src="/logo.png" alt="Veer Balaji Foundation Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', transform: 'scale(1.02)' }} />
           </div>
 
           {/* Trust name */}
