@@ -20,7 +20,7 @@ const sendEmail = async (to, subject, htmlContent, textContent = '') => {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        from: 'MITRA HINDU SAMAJ SEVA FOUNDATION <onboarding@resend.dev>',
+        from: 'MITRA HINDU SAMAJ SEVA FOUNDATION <noreply@veerbalaji.com>',
         to: destinations,
         subject: subject,
         html: htmlContent,
