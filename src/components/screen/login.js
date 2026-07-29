@@ -379,8 +379,8 @@ const LoginPage = () => {
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, #EA1F25, #d4af37, #1a0f5e)' }} />
 
           {/* Emblem */}
-          <div className="lp-mandala" style={{ width: 200, height: 200, borderRadius: '50%', border: '3px solid #d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '1.5rem', background: '#ffffff' }}>
-            <img src="/logo.png" alt="Veer Balaji Foundation Logo" style={{ width: '88%', height: '88%', objectFit: 'contain' }} />
+          <div className="lp-mandala" style={{ width: 200, height: 200, borderRadius: '50%', border: '3px solid #d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '1.5rem', background: 'transparent', overflow: 'hidden' }}>
+            <img src="/logo.png" alt="Veer Balaji Foundation Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
 
           {/* Trust name */}
