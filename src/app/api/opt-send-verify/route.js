@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 const sendEmail = require('@/lib/sendEmail');
+import admin from '../admin';
 
 // ── Authorized Admin Accounts ────────────────────────────────────────────────
 const ALLOWED_ADMINS = [
@@ -7,10 +8,29 @@ const ALLOWED_ADMINS = [
   "veerbalajifoundation@gmail.com"
 ];
 
-const globalOtpStore = globalThis.__otpStore || new Map();
-if (!globalThis.__otpStore) globalThis.__otpStore = globalOtpStore;
+const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 
-const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes validity
+// Use Firestore (via Admin SDK) to persist OTPs across serverless instances
+async function saveOtp(email, otp) {
+  const db = admin.firestore();
+  await db.collection('__otpStore').doc(email).set({
+    otp,
+    expiresAt: Date.now() + OTP_EXPIRY_MS,
+    createdAt: Date.now(),
+  });
+}
+
+async function getOtp(email) {
+  const db = admin.firestore();
+  const doc = await db.collection('__otpStore').doc(email).get();
+  if (!doc.exists) return null;
+  return doc.data();
+}
+
+async function deleteOtp(email) {
+  const db = admin.firestore();
+  await db.collection('__otpStore').doc(email).delete();
+}
 
 export async function POST(req) {
   try {
@@ -27,8 +47,9 @@ export async function POST(req) {
 
     if (action === "send") {
       const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      const expiresAt = Date.now() + OTP_EXPIRY_MS;
-      globalOtpStore.set(cleanEmail, { otp: generatedOtp, expiresAt });
+
+      // Persist OTP in Firestore so all serverless instances can read it
+      await saveOtp(cleanEmail, generatedOtp);
 
       const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 12px; background-color: #ffffff;">
@@ -67,7 +88,6 @@ export async function POST(req) {
         return NextResponse.json({ success: true, message: "Verification OTP sent to your registered email address!" });
       } catch (emailErr) {
         console.warn(`[Resend Warning for ${cleanEmail}]`, emailErr.message);
-        // OTP is still stored — admin can use it even if email delivery had transient issues
         return NextResponse.json({
           success: true,
           message: "Verification OTP generated and sent to your email address."
@@ -81,16 +101,20 @@ export async function POST(req) {
       }
 
       const inputOtp = otp.trim();
-      const record = globalOtpStore.get(cleanEmail);
+      const record = await getOtp(cleanEmail);
 
-      if (record && inputOtp === record.otp && Date.now() <= record.expiresAt) {
-        globalOtpStore.delete(cleanEmail);
-        return NextResponse.json({ success: true, message: "OTP verified successfully." });
+      if (!record) {
+        return NextResponse.json({ error: "No OTP found. Please request a new OTP." }, { status: 400 });
       }
 
-      if (record && Date.now() > record.expiresAt) {
-        globalOtpStore.delete(cleanEmail);
+      if (Date.now() > record.expiresAt) {
+        await deleteOtp(cleanEmail);
         return NextResponse.json({ error: "OTP expired. Please request a new OTP." }, { status: 400 });
+      }
+
+      if (inputOtp === record.otp) {
+        await deleteOtp(cleanEmail);
+        return NextResponse.json({ success: true, message: "OTP verified successfully." });
       }
 
       return NextResponse.json({ error: "Incorrect OTP code. Please check your email inbox." }, { status: 400 });
@@ -98,6 +122,7 @@ export async function POST(req) {
 
     return NextResponse.json({ error: "Invalid action." }, { status: 400 });
   } catch (error) {
+    console.error('[OTP Route Error]', error);
     return NextResponse.json({ error: error.message || "Server error." }, { status: 500 });
   }
 }
