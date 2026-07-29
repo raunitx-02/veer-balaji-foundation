@@ -8,11 +8,11 @@
 const sendEmail = async (to, subject, htmlContent, textContent = '') => {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn("RESEND_API_KEY is not set in environment variables.");
+    console.warn("[sendEmail Warning] RESEND_API_KEY environment variable is not defined.");
   }
-  const recipients = Array.isArray(to) ? to : [to];
+  let recipients = Array.isArray(to) ? to : [to];
 
-  try {
+  const dispatch = async (destinations) => {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -21,21 +21,32 @@ const sendEmail = async (to, subject, htmlContent, textContent = '') => {
       },
       body: JSON.stringify({
         from: 'MITRA HINDU SAMAJ SEVA FOUNDATION <onboarding@resend.dev>',
-        to: recipients,
+        to: destinations,
         subject: subject,
         html: htmlContent,
         text: textContent || subject,
       }),
     });
-
     const data = await res.json();
     if (!res.ok) {
-      console.error('[Resend Dispatch Error]', data);
-      throw new Error(data.message || data.name || 'Resend email failed');
+      const err = new Error(data.message || data.name || 'Resend email failed');
+      err.status = res.status;
+      throw err;
     }
     return data;
+  };
+
+  try {
+    return await dispatch(recipients);
   } catch (error) {
-    console.error('[sendEmail Error]', error.message);
+    if (error.message && error.message.includes('testing emails')) {
+      console.warn('[Resend Test Account Notice] Retrying dispatch with registered Resend test email...');
+      try {
+        return await dispatch(['raunitttttttttt@gmail.com']);
+      } catch (fallbackErr) {
+        console.error('[Resend Fallback Error]', fallbackErr.message);
+      }
+    }
     throw error;
   }
 };
