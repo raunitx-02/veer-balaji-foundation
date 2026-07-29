@@ -157,47 +157,53 @@ const LoginPage = () => {
     return () => clearInterval(t);
   }, [countdown, step]);
 
+  const ALLOWED_ADMIN_EMAIL = "veerhanumanfoundation@gmail.com";
+  const ALLOWED_ADMIN_PASS  = "OMPVEER@2828";
+
   // Step 1 — Email
   const onSubmitEmail = async (e) => {
     e.preventDefault();
-    if (!emailVal || !emailVal.includes('@')) { showAlert('Please enter a valid email address.', 'error'); return; }
+    const cleanEmail = emailVal.toLowerCase().trim();
+    if (!cleanEmail || !cleanEmail.includes('@')) { 
+      showAlert('Please enter a valid email address.', 'error'); 
+      return; 
+    }
+
+    if (cleanEmail !== ALLOWED_ADMIN_EMAIL) {
+      showAlert('Access Denied: Only authorized email (veerhanumanfoundation@gmail.com) is permitted.', 'error');
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await fetch('/api/user', {
+      const otpRes = await fetch('/api/opt-send-verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'checkEmail', email: emailVal }),
+        body: JSON.stringify({ action: 'send', email: cleanEmail }),
       });
-      const data = await res.json();
-      if (!data.exists) { showAlert('This email is not registered.', 'error'); setLoading(false); return; }
-
-      if (needsOTPVerification(emailVal)) {
-        const otpRes = await fetch('/api/opt-send-verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'send', email: emailVal }),
-        });
-        if (otpRes.ok) {
-          setEmail(emailVal);
-          showAlert('OTP sent to your email!', 'success');
-          setStep(2); setCountdown(OTP_TIMEOUT); setCanResend(false);
-        } else {
-          const d = await otpRes.json();
-          showAlert(d.error || 'Failed to send OTP.', 'error');
-        }
+      const data = await otpRes.json();
+      if (otpRes.ok) {
+        setEmail(cleanEmail);
+        showAlert('Verification OTP sent to your email (veerhanumanfoundation@gmail.com)!', 'success');
+        setStep(2); 
+        setCountdown(300); 
+        setCanResend(false);
       } else {
-        setEmail(emailVal);
-        setStep(3);
-        showAlert('Please enter your password to continue.', 'info');
+        showAlert(data.error || 'Failed to send OTP to email.', 'error');
       }
-    } catch { showAlert('An error occurred. Please try again.', 'error'); }
+    } catch { 
+      showAlert('An error occurred while sending OTP. Please try again.', 'error'); 
+    }
     setLoading(false);
   };
 
   // Step 2 — OTP
   const onSubmitOtp = async (e) => {
     e.preventDefault();
-    if (!otpVal || otpVal.length !== 6) { showAlert('Please enter the 6-digit OTP.', 'error'); return; }
+    if (!otpVal || otpVal.length !== 6) { 
+      showAlert('Please enter the 6-digit OTP code sent to your email.', 'error'); 
+      return; 
+    }
     setLoading(true);
     try {
       const res = await fetch('/api/opt-send-verify', {
@@ -205,36 +211,57 @@ const LoginPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'verify', email, otp: otpVal }),
       });
+      const data = await res.json();
       if (res.ok) {
         setLastVerification(email);
-        showAlert('OTP verified! Please enter your password.', 'success');
+        showAlert('OTP verified successfully! Please enter your password to continue.', 'success');
         setStep(3);
-      } else { showAlert('OTP verification failed.', 'error'); }
-    } catch { showAlert('An error occurred during verification.', 'error'); }
+      } else { 
+        showAlert(data.error || 'Invalid OTP. Please check your email inbox.', 'error'); 
+      }
+    } catch { 
+      showAlert('An error occurred during OTP verification.', 'error'); 
+    }
     setLoading(false);
   };
 
   // Step 3 — Password
   const onSubmitPassword = async (e) => {
     e.preventDefault();
-    if (!passVal || passVal.length < 6) { showAlert('Password must be at least 6 characters.', 'error'); return; }
+    if (!passVal) { 
+      showAlert('Please enter your password.', 'error'); 
+      return; 
+    }
+
+    if (passVal !== ALLOWED_ADMIN_PASS) {
+      showAlert('Incorrect password for admin account.', 'error');
+      return;
+    }
+
     setLoading(true);
     try {
-      let user;
+      let userObj;
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, passVal);
-        user = userCredential.user;
+        userObj = userCredential.user;
       } catch (authError) {
-        console.warn("Firebase Auth fallback used:", authError.message);
-        user = {
-          uid: "user_rravenger7",
-          email: email,
-          displayName: "Admin User",
-          name: "Admin User",
+        console.warn("Firebase Auth signin notice:", authError.message);
+        userObj = {
+          uid: "user_veerhanumanfoundation",
+          email: ALLOWED_ADMIN_EMAIL,
+          displayName: "Veer Hanuman Admin",
+          username: "Veer Hanuman Admin",
           role: "admin"
         };
-        localStorage.setItem('dev_user', JSON.stringify(user));
       }
+
+      localStorage.setItem('dev_user', JSON.stringify({
+        uid: "user_veerhanumanfoundation",
+        email: ALLOWED_ADMIN_EMAIL,
+        displayName: "Veer Hanuman Admin",
+        username: "Veer Hanuman Admin",
+        role: "admin"
+      }));
 
       let sessionToken = localStorage.getItem('session_token');
       if (!sessionToken) {
@@ -243,16 +270,16 @@ const LoginPage = () => {
       }
 
       try {
-        if (user.uid !== "user_rravenger7") {
-          await saveSession(user.uid, sessionToken);
-        }
+        await saveSession("user_veerhanumanfoundation", sessionToken);
       } catch (sErr) {
         console.warn("Session save warning:", sErr);
       }
 
       message.success('Login Successful!');
       window.location.href = '/';
-    } catch (error) { showAlert(error.message || 'Login failed.', 'error'); }
+    } catch (error) { 
+      showAlert(error.message || 'Login failed.', 'error'); 
+    }
     setLoading(false);
   };
 

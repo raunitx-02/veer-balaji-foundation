@@ -1,12 +1,24 @@
 import { NextResponse } from "next/server";
 import admin from "../admin";
 
+const ALLOWED_ADMIN_EMAIL = "veerhanumanfoundation@gmail.com";
+
 export async function POST(req) {
   const { action, email, password, uid, newPassword, OrgData } = await req.json();
 
   try {
+    if (action === "checkEmail") {
+      const cleanEmail = (email || '').toLowerCase().trim();
+      if (cleanEmail !== ALLOWED_ADMIN_EMAIL) {
+        return NextResponse.json({ 
+          exists: false, 
+          error: "Access Denied: Only authorized email (veerhanumanfoundation@gmail.com) is permitted to access this panel." 
+        }, { status: 403 });
+      }
+      return NextResponse.json({ exists: true });
+    }
+
     if (action === "create") {
-      // Check if user already exists
       try {
         await admin.auth().getUserByEmail(email);
         return NextResponse.json({ error: "User with this email already exists." }, { status: 400 });
@@ -16,10 +28,7 @@ export async function POST(req) {
         }
       }
 
-      // Create Auth user
       const userRecord = await admin.auth().createUser({ email, password });
-
-      // ---- SET CUSTOM CLAIMS HERE ----
       await admin.auth().setCustomUserClaims(userRecord.uid, {
         ...OrgData
       });
@@ -35,21 +44,6 @@ export async function POST(req) {
     if (action === "updatePassword") {
       await admin.auth().updateUser(uid, { password: newPassword });
       return NextResponse.json({ success: true });
-    }
-
-    if (action === "checkEmail") {
-      if (email?.toLowerCase() === "rravenger7@gmail.com") {
-        return NextResponse.json({ exists: true });
-      }
-      try {
-        await admin.auth().getUserByEmail(email);
-        return NextResponse.json({ exists: true });
-      } catch (err) {
-        if (err.code === "auth/user-not-found") {
-          return NextResponse.json({ exists: true });
-        }
-        return NextResponse.json({ exists: true });
-      }
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
