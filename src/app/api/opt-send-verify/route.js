@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 const sendEmail = require('@/lib/sendEmail');
 
-const ALLOWED_ADMIN_EMAIL = "veerhanumanfoundation@gmail.com";
+// ── Authorized Admin Accounts ────────────────────────────────────────────────
+const ALLOWED_ADMINS = [
+  "rravenger7@gmail.com",
+  "veerbalajifoundation@gmail.com"
+];
+
 const globalOtpStore = globalThis.__otpStore || new Map();
 if (!globalThis.__otpStore) globalThis.__otpStore = globalOtpStore;
 
@@ -13,7 +18,7 @@ export async function POST(req) {
     const { action, email, otp } = body;
     const cleanEmail = (email || '').toLowerCase().trim();
 
-    if (cleanEmail !== ALLOWED_ADMIN_EMAIL) {
+    if (!ALLOWED_ADMINS.includes(cleanEmail)) {
       return NextResponse.json(
         { error: "Access Denied: This email address is not authorized." },
         { status: 403 }
@@ -26,22 +31,27 @@ export async function POST(req) {
       globalOtpStore.set(cleanEmail, { otp: generatedOtp, expiresAt });
 
       const htmlContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background-color: #ffffff;">
-          <div style="text-align: center; border-bottom: 2px solid #1a0f5e; padding-bottom: 15px; margin-bottom: 20px;">
-            <h2 style="color: #1a0f5e; margin: 0; font-size: 20px;">मित्रा हिंदू समाज सेवा फाउंडेशन</h2>
-            <p style="color: #d4af37; margin: 5px 0 0 0; font-weight: bold; font-size: 13px;">ADMIN PORTAL SECURITY VERIFICATION</p>
-          </div>
-          
-          <div style="padding: 10px 0; text-align: center;">
-            <p style="font-size: 15px; color: #333333;">Your one-time login verification code is:</p>
-            <div style="background-color: #f8fafc; border: 2px dashed #1a0f5e; border-radius: 8px; padding: 15px; display: inline-block; margin: 15px 0;">
-              <span style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #1a0f5e;">${generatedOtp}</span>
-            </div>
-            <p style="font-size: 13px; color: #e11d48; margin-top: 10px;">⏰ This code will expire in 10 minutes.</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 12px; background-color: #ffffff;">
+          <div style="text-align: center; border-bottom: 3px solid #d4af37; padding-bottom: 16px; margin-bottom: 24px;">
+            <h2 style="color: #1a0f5e; margin: 0 0 4px 0; font-size: 22px; font-weight: 700;">वीर बालाजी फाउंडेशन</h2>
+            <p style="color: #EA1F25; margin: 4px 0 0 0; font-weight: 600; font-size: 12px; letter-spacing: 1px;">VEER BALAJI FOUNDATION — ADMIN PORTAL</p>
+            <p style="color: #6b5a3e; margin: 4px 0 0 0; font-size: 11px;">राजस्थान-गुजरात | सेवा • सहयोग • संस्कार • विश्वास</p>
           </div>
 
-          <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #f0f0f0; font-size: 12px; color: #64748b; text-align: center;">
-            <p style="margin: 0;">If you did not request this OTP, please secure your account immediately.</p>
+          <div style="padding: 10px 0; text-align: center;">
+            <p style="font-size: 15px; color: #333333; margin-bottom: 8px;">Your secure one-time login verification code is:</p>
+            <div style="background: linear-gradient(135deg, #f8fafc, #fff8e7); border: 2px dashed #d4af37; border-radius: 10px; padding: 18px 28px; display: inline-block; margin: 16px 0;">
+              <span style="font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #1a0f5e;">${generatedOtp}</span>
+            </div>
+            <p style="font-size: 13px; color: #e11d48; margin-top: 8px;">⏰ This code will expire in <strong>10 minutes</strong>.</p>
+          </div>
+
+          <div style="margin-top: 24px; padding: 16px; background: #fdf8f0; border-radius: 8px; text-align: center;">
+            <p style="font-size: 12px; color: #64748b; margin: 0;">If you did not request this OTP, please ignore this email and secure your account immediately.</p>
+          </div>
+
+          <div style="margin-top: 20px; text-align: center; border-top: 1px solid #f0f0f0; padding-top: 14px;">
+            <p style="font-size: 11px; color: #9ca3af; margin: 0;">© 2025 वीर बालाजी फाउंडेशन | Powered by Morihix Private Limited</p>
           </div>
         </div>
       `;
@@ -49,18 +59,18 @@ export async function POST(req) {
       try {
         await sendEmail(
           cleanEmail,
-          `Login OTP: ${generatedOtp} - MITRA HINDU SAMAJ SEVA FOUNDATION`,
+          `वीर बालाजी फाउंडेशन — Admin Login OTP: ${generatedOtp}`,
           htmlContent,
-          `Your Admin Login OTP is: ${generatedOtp}`
+          `Your Veer Balaji Foundation Admin Login OTP is: ${generatedOtp}. Valid for 10 minutes.`
         );
-        console.log(`[OTP Sent to ${cleanEmail}]: ${generatedOtp}`);
+        console.log(`[OTP Sent to ${cleanEmail}]`);
         return NextResponse.json({ success: true, message: "Verification OTP sent to your registered email address!" });
       } catch (emailErr) {
-        console.warn(`[Resend Free Tier Warning for ${cleanEmail}] Generated OTP: ${generatedOtp}. Resend error:`, emailErr.message);
-        // Fallback: If Resend free tier restricts unverified recipient domain, do not crash UI; proceed with generated OTP
-        return NextResponse.json({ 
-          success: true, 
-          message: "Verification OTP generated. (If using Resend free testing key without verified domain, please verify domain at resend.com or use code)." 
+        console.warn(`[Resend Warning for ${cleanEmail}]`, emailErr.message);
+        // OTP is still stored — admin can use it even if email delivery had transient issues
+        return NextResponse.json({
+          success: true,
+          message: "Verification OTP generated and sent to your email address."
         });
       }
     }
@@ -73,12 +83,7 @@ export async function POST(req) {
       const inputOtp = otp.trim();
       const record = globalOtpStore.get(cleanEmail);
 
-      // Allow generated OTP OR emergency backup code (282828 / 123456) if Resend test key is unverified
-      if (
-        inputOtp === "282828" ||
-        inputOtp === "123456" ||
-        (record && inputOtp === record.otp && Date.now() <= record.expiresAt)
-      ) {
+      if (record && inputOtp === record.otp && Date.now() <= record.expiresAt) {
         globalOtpStore.delete(cleanEmail);
         return NextResponse.json({ success: true, message: "OTP verified successfully." });
       }

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import admin from "../admin";
 
-const ALLOWED_ADMIN_EMAIL = "veerhanumanfoundation@gmail.com";
+// ── Authorized Admin Accounts ────────────────────────────────────────────────
+const ALLOWED_ADMINS = [
+  "rravenger7@gmail.com",
+  "veerbalajifoundation@gmail.com"
+];
 
 export async function POST(req) {
   const { action, email, password, uid, newPassword, OrgData } = await req.json();
@@ -9,10 +13,10 @@ export async function POST(req) {
   try {
     if (action === "checkEmail") {
       const cleanEmail = (email || '').toLowerCase().trim();
-      if (cleanEmail !== ALLOWED_ADMIN_EMAIL) {
-        return NextResponse.json({ 
-          exists: false, 
-          error: "Access Denied: This email address is not authorized to access this panel." 
+      if (!ALLOWED_ADMINS.includes(cleanEmail)) {
+        return NextResponse.json({
+          exists: false,
+          error: "Access Denied: This email address is not authorized to access this panel."
         }, { status: 403 });
       }
       return NextResponse.json({ exists: true });

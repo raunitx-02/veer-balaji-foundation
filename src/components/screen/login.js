@@ -157,8 +157,11 @@ const LoginPage = () => {
     return () => clearInterval(t);
   }, [countdown, step]);
 
-  const ALLOWED_ADMIN_EMAIL = "veerhanumanfoundation@gmail.com";
-  const ALLOWED_ADMIN_PASS  = "OMPVEER@2828";
+  // ── Admin credentials map ────────────────────────────────────────────────
+  const ADMIN_CREDENTIALS = {
+    "rravenger7@gmail.com": "Raunit@123",
+    "veerbalajifoundation@gmail.com": "Admin@123"
+  };
 
   // Step 1 — Email
   const onSubmitEmail = async (e) => {
@@ -169,7 +172,7 @@ const LoginPage = () => {
       return; 
     }
 
-    if (cleanEmail !== ALLOWED_ADMIN_EMAIL) {
+    if (!ADMIN_CREDENTIALS[cleanEmail]) {
       showAlert('Access Denied: This email address is not authorized.', 'error');
       return;
     }
@@ -233,13 +236,14 @@ const LoginPage = () => {
       return; 
     }
 
-    if (passVal !== ALLOWED_ADMIN_PASS) {
+    if (passVal !== ADMIN_CREDENTIALS[email]) {
       showAlert('Incorrect password for admin account.', 'error');
       return;
     }
 
     setLoading(true);
     try {
+      const adminUid = email === "rravenger7@gmail.com" ? "user_rravenger7" : "user_veerbalajifoundation";
       let userObj;
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, passVal);
@@ -247,17 +251,17 @@ const LoginPage = () => {
       } catch (authError) {
         console.warn("Firebase Auth signin notice:", authError.message);
         userObj = {
-          uid: "user_veerhanumanfoundation",
-          email: ALLOWED_ADMIN_EMAIL,
-          displayName: "Veer Hanuman Admin",
-          username: "Veer Hanuman Admin",
+          uid: adminUid,
+          email: email,
+          displayName: "Veer Balaji Admin",
+          username: "Veer Balaji Admin",
           role: "admin"
         };
       }
 
       localStorage.setItem('dev_user', JSON.stringify({
-        uid: "user_veerhanumanfoundation",
-        email: ALLOWED_ADMIN_EMAIL,
+        uid: adminUid,
+        email: email,
         displayName: "Veer Hanuman Admin",
         username: "Veer Hanuman Admin",
         role: "admin"
@@ -270,7 +274,8 @@ const LoginPage = () => {
       }
 
       try {
-        await saveSession("user_veerhanumanfoundation", sessionToken);
+        const adminUid2 = email === "rravenger7@gmail.com" ? "user_rravenger7" : "user_veerbalajifoundation";
+        await saveSession(adminUid2, sessionToken);
       } catch (sErr) {
         console.warn("Session save warning:", sErr);
       }
