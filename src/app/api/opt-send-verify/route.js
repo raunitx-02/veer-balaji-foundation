@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import { createHmac } from 'crypto';
 const sendEmail = require('@/lib/sendEmail');
 
-// ── Authorized Admin Accounts ────────────────────────────────────────────────
+// ── Authorized Admin Accounts ─────────────────────────────────────────────────
 const ALLOWED_ADMINS = [
   "rravenger7@gmail.com",
   "veerbalajifoundation@gmail.com"
@@ -9,61 +10,45 @@ const ALLOWED_ADMINS = [
 
 const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 
-// ── Firebase REST API helpers (no Admin SDK needed) ──────────────────────────
-// Uses the same project/API key the client-side app uses — always enabled
-const FIREBASE_PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'admin-panel-2437a';
-const FIREBASE_API_KEY    = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-const FIRESTORE_BASE      = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+// Secret key for HMAC signing — uses env var, falls back to a fixed secret
+const SECRET = process.env.RESEND_API_KEY || process.env.NEXTAUTH_SECRET || 'veer-balaji-otp-secret-2025';
 
-async function firestoreSet(collection, docId, fields) {
-  const url = `${FIRESTORE_BASE}/${collection}/${encodeURIComponent(docId)}?key=${FIREBASE_API_KEY}`;
-  const body = {
-    fields: Object.fromEntries(
-      Object.entries(fields).map(([k, v]) => [
-        k,
-        typeof v === 'number'
-          ? { integerValue: String(v) }
-          : { stringValue: String(v) }
-      ])
-    )
-  };
-  const res = await fetch(url, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err?.error?.message || 'Firestore write failed');
+// ── Stateless HMAC token — no database needed ─────────────────────────────────
+function createToken(email, otp, expiresAt) {
+  const payload = `${email}|${otp}|${expiresAt}`;
+  const sig = createHmac('sha256', SECRET).update(payload).digest('hex');
+  return Buffer.from(`${otp}|${expiresAt}|${sig}`).toString('base64url');
+}
+
+function verifyToken(email, otp, token) {
+  try {
+    const decoded = Buffer.from(token, 'base64url').toString('utf8');
+    const parts = decoded.split('|');
+    if (parts.length !== 3) return { valid: false, reason: 'Invalid token format.' };
+    const [storedOtp, expiresAt, sig] = parts;
+
+    // Verify signature
+    const payload = `${email}|${storedOtp}|${expiresAt}`;
+    const expectedSig = createHmac('sha256', SECRET).update(payload).digest('hex');
+    if (sig !== expectedSig) return { valid: false, reason: 'Invalid OTP token. Please request a new OTP.' };
+
+    // Check expiry
+    if (Date.now() > Number(expiresAt)) return { valid: false, reason: 'OTP expired. Please request a new OTP.' };
+
+    // Check OTP
+    if (otp.trim() !== storedOtp) return { valid: false, reason: 'Incorrect OTP code. Please check your email inbox.' };
+
+    return { valid: true };
+  } catch {
+    return { valid: false, reason: 'Invalid token. Please request a new OTP.' };
   }
-  return res.json();
 }
 
-async function firestoreGet(collection, docId) {
-  const url = `${FIRESTORE_BASE}/${collection}/${encodeURIComponent(docId)}?key=${FIREBASE_API_KEY}`;
-  const res = await fetch(url);
-  if (res.status === 404) return null;
-  if (!res.ok) return null;
-  const data = await res.json();
-  if (!data.fields) return null;
-  // Decode fields
-  const result = {};
-  for (const [k, v] of Object.entries(data.fields)) {
-    result[k] = v.integerValue !== undefined ? Number(v.integerValue) : v.stringValue;
-  }
-  return result;
-}
-
-async function firestoreDelete(collection, docId) {
-  const url = `${FIRESTORE_BASE}/${collection}/${encodeURIComponent(docId)}?key=${FIREBASE_API_KEY}`;
-  await fetch(url, { method: 'DELETE' });
-}
-
-// ── Route handler ────────────────────────────────────────────────────────────
+// ── Route handler ─────────────────────────────────────────────────────────────
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { action, email, otp } = body;
+    const { action, email, otp, token } = body;
     const cleanEmail = (email || '').toLowerCase().trim();
 
     if (!ALLOWED_ADMINS.includes(cleanEmail)) {
@@ -77,9 +62,7 @@ export async function POST(req) {
     if (action === "send") {
       const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = Date.now() + OTP_EXPIRY_MS;
-
-      // Persist in Firestore via REST (no Admin SDK, always works)
-      await firestoreSet('__otpStore', cleanEmail, { otp: generatedOtp, expiresAt });
+      const signedToken = createToken(cleanEmail, generatedOtp, expiresAt);
 
       const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 12px; background-color: #ffffff;">
@@ -115,33 +98,25 @@ export async function POST(req) {
         console.warn(`[Resend Warning for ${cleanEmail}]`, emailErr.message);
       }
 
-      return NextResponse.json({ success: true, message: "Verification OTP sent to your registered email address!" });
+      // Return the signed token to the client — client stores it and sends it back on verify
+      return NextResponse.json({
+        success: true,
+        token: signedToken,
+        message: "Verification OTP sent to your registered email address!"
+      });
     }
 
     // ── VERIFY OTP ────────────────────────────────────────────────────────────
     if (action === "verify") {
-      if (!otp) {
-        return NextResponse.json({ error: "OTP code is required." }, { status: 400 });
+      if (!otp || !token) {
+        return NextResponse.json({ error: "OTP and token are required." }, { status: 400 });
       }
 
-      const inputOtp = otp.trim();
-      const record = await firestoreGet('__otpStore', cleanEmail);
-
-      if (!record) {
-        return NextResponse.json({ error: "No OTP found. Please request a new OTP." }, { status: 400 });
-      }
-
-      if (Date.now() > Number(record.expiresAt)) {
-        await firestoreDelete('__otpStore', cleanEmail);
-        return NextResponse.json({ error: "OTP expired. Please request a new OTP." }, { status: 400 });
-      }
-
-      if (inputOtp === record.otp) {
-        await firestoreDelete('__otpStore', cleanEmail);
+      const result = verifyToken(cleanEmail, otp, token);
+      if (result.valid) {
         return NextResponse.json({ success: true, message: "OTP verified successfully." });
       }
-
-      return NextResponse.json({ error: "Incorrect OTP code. Please check your email inbox." }, { status: 400 });
+      return NextResponse.json({ error: result.reason }, { status: 400 });
     }
 
     return NextResponse.json({ error: "Invalid action." }, { status: 400 });

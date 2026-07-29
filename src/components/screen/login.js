@@ -141,6 +141,7 @@ const LoginPage = () => {
   const [countdown, setCountdown] = useState(0);
   const [canResend, setCanResend] = useState(false);
   const [alert, setAlert]       = useState(null); // { msg, type }
+  const [otpToken, setOtpToken] = useState(''); // HMAC-signed token from server
 
   const showAlert = (msg, type = 'info') => {
     setAlert({ msg, type });
@@ -187,6 +188,7 @@ const LoginPage = () => {
       const data = await otpRes.json();
       if (otpRes.ok) {
         setEmail(cleanEmail);
+        setOtpToken(data.token || ''); // Store the HMAC-signed token
         showAlert('Verification OTP sent to your registered email address!', 'success');
         setStep(2); 
         setCountdown(300); 
@@ -212,7 +214,7 @@ const LoginPage = () => {
       const res = await fetch('/api/opt-send-verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'verify', email, otp: otpVal }),
+        body: JSON.stringify({ action: 'verify', email, otp: otpVal, token: otpToken }),
       });
       const data = await res.json();
       if (res.ok) {
