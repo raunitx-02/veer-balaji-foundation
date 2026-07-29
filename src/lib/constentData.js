@@ -4,7 +4,7 @@ import logo from "@/app/api/helperfile/Images/logo";
 import semkariLogo from "@/app/api/helperfile/Images/semkariLogo";
 
 export const TrsutData={
-    name:"मित्रा हिंदू समाज सेवा फाउंडेशन",
+    name:"वीर बालाजी फाउंडेशन",
     cityState:"राजस्थान-गुजरात",
     address:"प्रताप चौक, रबारियों का टांका, बालोतरा 344022",
     contact:"9166945821 (धनराज सोलंकी)",
@@ -12,8 +12,8 @@ export const TrsutData={
     trustPresident:"धनराज सोलंकी",
     founder: "धनराज सोलंकी (9166945821)",
     frameImg:certificateImg,
-    email:"admin@mitrahindu.org",
-    website:"admin.mitrahindu.org",
+    email:"admin@veerbalaji.com",
+    website:"admin.veerbalaji.com",
     regNo:"U88900RJ2026NPL115440",
     logo:logo,
     RightLogo:null,
@@ -22,7 +22,8 @@ export const TrsutData={
         "॥ श्री क्षेमकरी माता नमः ॥",
         "॥ श्री गणेशाय नमः ॥",
         "॥ श्री सोनाणा क्षेत्रपाल नमः ॥",
-    ]
+    ],
+    poweredBy: "Powered by Morihix Private Limited"
 }
 
 export const pdfColors={

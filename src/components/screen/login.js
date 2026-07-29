@@ -380,10 +380,9 @@ const LoginPage = () => {
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, #EA1F25, #d4af37, #1a0f5e)' }} />
 
           {/* Emblem */}
-          <div className="lp-mandala" style={{ width: 176, height: 176, borderRadius: '50%', border: '2px solid #d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '1.5rem' }}>
-            <div style={{ width: 118, height: 118, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-              {/* <span style={{ fontFamily: "'Noto Sans Devanagari', sans-serif", fontSize: '2.6rem', color: '#d4af37', lineHeight: 1 }}>ॐ</span> */}
-              <Image src={logo} alt="Trust Logo" width={80} height={80} style={{ width: '100%', height: "100%", borderRadius: 8, boxShadow: '0 4px 12px rgba(212,175,55,0.3)' }} />
+          <div className="lp-mandala" style={{ width: 176, height: 176, borderRadius: '50%', border: '2px solid #d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '1.5rem', background: '#fff' }}>
+            <div style={{ width: 140, height: 140, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
+              <img src="/logo.png" alt="Veer Balaji Foundation Logo" style={{ width: '100%', height: "100%", objectFit: 'contain' }} />
             </div>
           </div>
 
