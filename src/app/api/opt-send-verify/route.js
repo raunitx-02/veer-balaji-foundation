@@ -15,7 +15,7 @@ export async function POST(req) {
 
     if (cleanEmail !== ALLOWED_ADMIN_EMAIL) {
       return NextResponse.json(
-        { error: "Access Denied: Only authorized admin email (veerhanumanfoundation@gmail.com) is allowed." },
+        { error: "Access Denied: This email address is not authorized." },
         { status: 403 }
       );
     }

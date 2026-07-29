@@ -170,7 +170,7 @@ const LoginPage = () => {
     }
 
     if (cleanEmail !== ALLOWED_ADMIN_EMAIL) {
-      showAlert('Access Denied: Only authorized email (veerhanumanfoundation@gmail.com) is permitted.', 'error');
+      showAlert('Access Denied: This email address is not authorized.', 'error');
       return;
     }
 
@@ -184,7 +184,7 @@ const LoginPage = () => {
       const data = await otpRes.json();
       if (otpRes.ok) {
         setEmail(cleanEmail);
-        showAlert('Verification OTP sent to your email (veerhanumanfoundation@gmail.com)!', 'success');
+        showAlert('Verification OTP sent to your registered email address!', 'success');
         setStep(2); 
         setCountdown(300); 
         setCanResend(false);

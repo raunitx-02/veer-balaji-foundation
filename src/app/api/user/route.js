@@ -12,7 +12,7 @@ export async function POST(req) {
       if (cleanEmail !== ALLOWED_ADMIN_EMAIL) {
         return NextResponse.json({ 
           exists: false, 
-          error: "Access Denied: Only authorized email (veerhanumanfoundation@gmail.com) is permitted to access this panel." 
+          error: "Access Denied: This email address is not authorized to access this panel." 
         }, { status: 403 });
       }
       return NextResponse.json({ exists: true });
