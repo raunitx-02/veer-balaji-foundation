@@ -306,6 +306,7 @@ const TopBar = ({ sidebarCollapsed, toggleSidebar, showNotifications, toggleNoti
                 <div className="user-dropdown-header">
                   <p className="text-sm font-bold text-slate-800 truncate">{user?.username || 'User'}</p>
                   <p className="text-xs text-slate-500 truncate mt-0.5">{user?.email || ''}</p>
+                  <p className="text-[10px] text-slate-400 font-medium mt-1">Powered by Morihix Private Limited</p>
                 </div>
                 <button onClick={() => setIsLogoutModalOpen(true)} className="logout-btn">
                   <FiLogOut size={15} />

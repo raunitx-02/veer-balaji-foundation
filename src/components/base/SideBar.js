@@ -183,14 +183,15 @@ const SideBar = ({ collapsed, onClose }) => {
         <div className={`sidebar-logo-border flex items-center h-16 px-4 flex-shrink-0
           ${collapsed ? 'justify-center' : 'gap-3'}
         `}>
-          {/* Mobile close btn — only on small screens, handled by parent */}
-          <div className="logo-icon w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
-            <FiLayers size={20} className="text-white" />
+          {/* Logo image */}
+          <div className="logo-icon w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden bg-white/10 p-0.5">
+            <img src="/logo.png" alt="Veer Balaji Logo" className="w-full h-full object-contain" />
           </div>
           {!collapsed && (
             <div>
-              <h2 className="font-bold text-white text-base leading-tight tracking-tight">MHSSS ADMIN</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Admin Panel</p>
+              <h2 className="font-bold text-white text-sm leading-tight tracking-tight">VEER BALAJI ADMIN</h2>
+              <p className="text-[10px] text-amber-400 font-medium mt-0.5">वीर बालाजी फाउंडेशन</p>
+              <p className="text-[9px] text-slate-500 mt-0.5">Powered by Morihix Private Limited</p>
             </div>
           )}
         </div>
@@ -218,7 +219,7 @@ const SideBar = ({ collapsed, onClose }) => {
         </nav>
 
         {/* User footer */}
-        <div className={`sidebar-footer px-3 py-4 flex-shrink-0 ${collapsed ? 'flex justify-center' : ''}`}>
+        <div className={`sidebar-footer px-3 py-3 flex-shrink-0 ${collapsed ? 'flex justify-center' : ''}`}>
           <div className={`flex items-center gap-3 ${collapsed ? '' : 'w-full'}`}>
             <div className="relative flex-shrink-0">
               <div className="avatar-ring w-10 h-10">
@@ -228,8 +229,9 @@ const SideBar = ({ collapsed, onClose }) => {
             </div>
             {!collapsed && user && (
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-200 truncate">{user.username || 'User'}</p>
-                <p className="text-xs text-slate-500 truncate">{user.email || 'admin@trust.com'}</p>
+                <p className="text-sm font-semibold text-slate-200 truncate">{user.username || 'Admin User'}</p>
+                <p className="text-xs text-slate-500 truncate">{user.email || 'admin@veerbalaji.com'}</p>
+                <p className="text-[9px] text-slate-600 truncate mt-0.5">Powered by Morihix Private Limited</p>
               </div>
             )}
           </div>

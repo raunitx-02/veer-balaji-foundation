@@ -9,6 +9,7 @@ import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { setAgentList, setgetAgentDataChange, setPrograms, setSelectedProgram } from '@/redux/slices/commonSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiLayers } from 'react-icons/fi';
+import { TrsutData } from '@/lib/constentData';
 
 // ─── Skeleton loader ────────────────────────────────────────────────────────
 const SkeletonRow = ({ w = 'w-full', h = 'h-4', className = '' }) => (
@@ -415,6 +416,10 @@ export default function CustomDashboardLayout({ children }) {
             <div className="page-card">
               {children}
             </div>
+            <footer className="py-4 px-6 text-center text-xs text-slate-500 border-t border-slate-200 mt-6 flex flex-col sm:flex-row items-center justify-between gap-2 bg-white rounded-xl shadow-sm">
+              <span>© {new Date().getFullYear()} <strong className="text-slate-700">{TrsutData.name}</strong>. All rights reserved.</span>
+              <span className="font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">Powered by Morihix Private Limited</span>
+            </footer>
           </main>
         </div>
       </div>
