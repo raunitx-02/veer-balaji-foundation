@@ -179,11 +179,6 @@ const Programs = () => {
             <Descriptions title="Basic Information" bordered column={2}>
               <Descriptions.Item label="Program Name" span={2}>
                 <span className="font-semibold text-lg">{selectedProgram?.name}</span>
-                {selectedProgram?.isSelected && (
-                  <Tag color="gold" className="ml-2">
-                    <StarFilled /> Selected
-                  </Tag>
-                )}
               </Descriptions.Item>
               <Descriptions.Item label="Hindi Name" span={2}>
                 {selectedProgram?.hiname || 'N/A'}
@@ -421,11 +416,6 @@ const Programs = () => {
                       <InfoCircleOutlined className="text-blue-500" />
                       {program.name}
                     </h2>
-                    {program.isSelected && (
-                      <Tag icon={<StarFilled />} color="gold">
-                        Selected
-                      </Tag>
-                    )}
                   </div>
                   <p className="text-gray-600 text-sm line-clamp-2">{program.about}</p>
                   {program.hiname && (
