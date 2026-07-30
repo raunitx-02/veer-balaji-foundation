@@ -373,9 +373,20 @@ tbody tr:last-child td{ border-bottom:none; }
 
 <!-- ══ LETTERHEAD ══════════════════════════════════════════════════ -->
 <div class="letterhead">
+    <div class="lh-top-titles">
+        ${topTitles}
+    </div>
     <div class="lh-inner">
-       <img src="${TrsutData.headerImg}" class="lh-headerImg" alt="Organization Logo"/>
-        ${rightLogoSrc ? `<img src="${rightLogoSrc}" class="lh-logo-right" alt="Right Logo"/>` : '<div style="width:70px"></div>'}
+        ${logoSrc ? `<img src="${logoSrc}" class="lh-logo" alt="Logo"/>` : '<div style="width:80px"></div>'}
+        <div class="lh-center">
+            <div class="lh-org-name">${trustData.name}</div>
+            <div class="lh-address">${trustData.address}</div>
+            <div class="lh-contact-row">
+                <div class="lh-contact-item"><span class="label">सम्पर्क सूत्र :</span> ${trustData.contact}</div>
+                <div class="lh-contact-item"><span class="label">रजिस्ट्रेशन नंबर :-</span> ${trustData.regNo}</div>
+            </div>
+        </div>
+        ${rightLogoSrc ? `<img src="${rightLogoSrc}" class="lh-logo-right" alt="Right Logo"/>` : '<div style="width:80px"></div>'}
     </div>
 </div>
 
