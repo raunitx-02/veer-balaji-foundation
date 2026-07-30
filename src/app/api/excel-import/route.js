@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
-import XLSX from "xlsx";
+import * as XLSXModule from "xlsx";
 import dayjs from "dayjs";
 import admin from "../admin";
+
+const XLSX = XLSXModule.default || XLSXModule;
 
 export const runtime = "nodejs";
 
@@ -26,17 +28,20 @@ function getAge(dobStr, joinStr) {
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { filePath, category = "isVivah", targetUids = ["user_rravenger7", "user_veerbalajifoundation"] } = body;
+    const { rows, category = "isVivah", targetUids = ["user_rravenger7", "user_veerbalajifoundation"] } = body;
 
-    if (!filePath || !fs.existsSync(filePath)) {
-      return NextResponse.json({ success: false, message: `File not found: ${filePath}` }, { status: 400 });
+    let dataRows = rows;
+    if (!dataRows && body.filePath && fs.existsSync(body.filePath)) {
+      const workbook = XLSX.readFile(body.filePath);
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      dataRows = rawData.filter(r => r && r.length > 2 && r[1] && r[0] !== "कर्मांक नंबर");
     }
 
-    const workbook = XLSX.readFile(filePath);
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    const rows = rawData.filter(r => r && r.length > 2 && r[1] && r[0] !== "कर्मांक नंबर");
+    if (!dataRows || !dataRows.length) {
+      return NextResponse.json({ success: false, message: "No data rows provided" }, { status: 400 });
+    }
 
     let totalMigrated = 0;
 
