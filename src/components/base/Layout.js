@@ -290,7 +290,6 @@ export default function CustomDashboardLayout({ children }) {
       dispatch(setSelectedProgram(defaultYojnas[0]));
     }
   };
-  };
 
   useEffect(() => {
     if (!loading && !user && !withoutLayout.includes(pathname)) {
