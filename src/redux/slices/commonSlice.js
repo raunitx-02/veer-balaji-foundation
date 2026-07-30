@@ -1,12 +1,91 @@
 // lib/features/counter/counterSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
+const DEFAULT_YOJNAS = [
+  {
+    id: 'prog_vivah_1',
+    name: 'पुत्र-पुत्री विवाह योजना',
+    hiname: 'पुत्र-पुत्री विवाह योजना',
+    englishName: 'Son-Daughter Marriage Scheme',
+    about: 'पुत्र एवं पुत्री के विवाह हेतु आर्थिक सहायता एवं समाज सहयोग योजना।',
+    noteLine: 'वीर बालाजी फाउंडेशन - पुत्र-पुत्री विवाह योजना',
+    category: 'isVivah',
+    isVivah: true,
+    isMamera: false,
+    isSuraksha: false,
+    isOther: false,
+    memberCount: 0,
+    inactivemembercount: 0,
+    ageGroups: [
+      { id: 'ag_1', startAge: 0, endAge: 18, joinFee: 1100, payAmount: 500 },
+      { id: 'ag_2', startAge: 19, endAge: 40, joinFee: 2100, payAmount: 1000 },
+      { id: 'ag_3', startAge: 41, endAge: 60, joinFee: 3100, payAmount: 1500 }
+    ],
+    locationGroups: [
+      { id: 'loc_1', location: 'राजस्थान', groupName: 'Group A', groupType: 'A' },
+      { id: 'loc_2', location: 'गुजरात', groupName: 'Group B', groupType: 'B' }
+    ],
+    createdAt: new Date().toISOString(),
+    isSelected: true
+  },
+  {
+    id: 'prog_mayra_1',
+    name: 'मायरा योजना',
+    hiname: 'मायरा योजना',
+    englishName: 'Mayra Scheme',
+    about: 'मायरा एवं सामाजिक अवसरों पर आर्थिक एवं सामाजिक सहयोग योजना।',
+    noteLine: 'वीर बालाजी फाउंडेशन - मायरा योजना',
+    category: 'isMamera',
+    isVivah: false,
+    isMamera: true,
+    isSuraksha: false,
+    isOther: false,
+    memberCount: 0,
+    inactivemembercount: 0,
+    ageGroups: [
+      { id: 'ag_m1', startAge: 0, endAge: 25, joinFee: 1500, payAmount: 750 },
+      { id: 'ag_m2', startAge: 26, endAge: 60, joinFee: 2500, payAmount: 1250 }
+    ],
+    locationGroups: [
+      { id: 'loc_m1', location: 'राजस्थान', groupName: 'Group A', groupType: 'A' },
+      { id: 'loc_m2', location: 'गुजरात', groupName: 'Group B', groupType: 'B' }
+    ],
+    createdAt: new Date().toISOString(),
+    isSelected: false
+  },
+  {
+    id: 'prog_suraksha_1',
+    name: 'सुरक्षा सहयोग योजना',
+    hiname: 'सुरक्षा सहयोग योजना',
+    englishName: 'Suraksha Sahyog Scheme',
+    about: 'सदस्यों एवं परिवारों हेतु आपातकालीन सुरक्षा एवं आर्थिक सहायता योजना।',
+    noteLine: 'वीर बालाजी फाउंडेशन - सुरक्षा सहयोग योजना',
+    category: 'isSuraksha',
+    isVivah: false,
+    isMamera: false,
+    isSuraksha: true,
+    isOther: false,
+    memberCount: 0,
+    inactivemembercount: 0,
+    ageGroups: [
+      { id: 'ag_s1', startAge: 0, endAge: 30, joinFee: 1000, payAmount: 500 },
+      { id: 'ag_s2', startAge: 31, endAge: 65, joinFee: 2000, payAmount: 1000 }
+    ],
+    locationGroups: [
+      { id: 'loc_s1', location: 'राजस्थान', groupName: 'Group A', groupType: 'A' },
+      { id: 'loc_s2', location: 'गुजरात', groupName: 'Group B', groupType: 'B' }
+    ],
+    createdAt: new Date().toISOString(),
+    isSelected: false
+  }
+];
+
 const initialState = {
-  programList: [],
-  selectedProgram: null,
+  programList: DEFAULT_YOJNAS,
+  selectedProgram: DEFAULT_YOJNAS[0],
   agentsList: [],
-    getAgentDataChange:false,
- getMemberDataChange:false
+  getAgentDataChange: false,
+  getMemberDataChange: false
 };
 
 export const commonSlice = createSlice({
