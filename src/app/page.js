@@ -292,24 +292,10 @@ export default function DashboardPage() {
 
 
 
-        {/* ── Dashboard Title + Action Buttons ── */}
-        <div className="db-title-row">
-          <div className="db-title">Dashboard</div>
-          <div className="db-actions">
-            <button className="dba-btn dba-payment" onClick={() => setIsAddPaymentOpen(true)}>
-              <DollarOutlined /> Add Payment
-            </button>
-            <button className="dba-btn dba-agent" onClick={() => setIsAddAgentOpen(true)}>
-              <TeamOutlined /> Add Agent
-            </button>
-            <button className="dba-btn dba-member" onClick={() => setIsAddMemberOpen(true)}>
-              <UserAddOutlined /> Add Member
-            </button>
-            <button className="dba-btn dba-req" onClick={() => setIsRequestsOpen(true)}>
-              Requests
-            </button>
-          </div>
-        </div>
+
+        {/* ── Dashboard Title ── */}
+        <div className="db-title">Dashboard</div>
+
 
         {/* ── Stat Cards Row ── */}
         <div className="db-stats">
