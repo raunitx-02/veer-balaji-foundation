@@ -203,9 +203,10 @@ export default function CustomDashboardLayout({ children }) {
         memberCount: 0,
         inactivemembercount: 0,
         ageGroups: [
-          { id: 'ag_1', startAge: 0, endAge: 18, joinFee: 1100, payAmount: 500 },
-          { id: 'ag_2', startAge: 19, endAge: 40, joinFee: 2100, payAmount: 1000 },
-          { id: 'ag_3', startAge: 41, endAge: 60, joinFee: 3100, payAmount: 1500 }
+          { id: 'ag_v1', startAge: 5, endAge: 10, joinFee: 2100, payAmount: 100 },
+          { id: 'ag_v2', startAge: 11, endAge: 15, joinFee: 5100, payAmount: 200 },
+          { id: 'ag_v3', startAge: 16, endAge: 21, joinFee: 11000, payAmount: 300 },
+          { id: 'ag_v4', startAge: 21, endAge: 100, joinFee: 11500, payAmount: 300 }
         ],
         locationGroups: [
           { id: 'loc_1', location: 'राजस्थान', groupName: 'Group A', groupType: 'A' },
@@ -229,8 +230,10 @@ export default function CustomDashboardLayout({ children }) {
         memberCount: 0,
         inactivemembercount: 0,
         ageGroups: [
-          { id: 'ag_m1', startAge: 0, endAge: 25, joinFee: 1500, payAmount: 750 },
-          { id: 'ag_m2', startAge: 26, endAge: 60, joinFee: 2500, payAmount: 1250 }
+          { id: 'ag_m1', startAge: 5, endAge: 10, joinFee: 2100, payAmount: 100 },
+          { id: 'ag_m2', startAge: 11, endAge: 15, joinFee: 5100, payAmount: 200 },
+          { id: 'ag_m3', startAge: 16, endAge: 21, joinFee: 11000, payAmount: 400 },
+          { id: 'ag_m4', startAge: 21, endAge: 100, joinFee: 11500, payAmount: 500 }
         ],
         locationGroups: [
           { id: 'loc_m1', location: 'राजस्थान', groupName: 'Group A', groupType: 'A' },
@@ -254,8 +257,10 @@ export default function CustomDashboardLayout({ children }) {
         memberCount: 0,
         inactivemembercount: 0,
         ageGroups: [
-          { id: 'ag_s1', startAge: 0, endAge: 30, joinFee: 1000, payAmount: 500 },
-          { id: 'ag_s2', startAge: 31, endAge: 65, joinFee: 2000, payAmount: 1000 }
+          { id: 'ag_s1', startAge: 40, endAge: 50, joinFee: 2100, payAmount: 100 },
+          { id: 'ag_s2', startAge: 51, endAge: 60, joinFee: 5100, payAmount: 200 },
+          { id: 'ag_s3', startAge: 61, endAge: 70, joinFee: 11000, payAmount: 300 },
+          { id: 'ag_s4', startAge: 71, endAge: 100, joinFee: 11500, payAmount: 350 }
         ],
         locationGroups: [
           { id: 'loc_s1', location: 'राजस्थान', groupName: 'Group A', groupType: 'A' },
