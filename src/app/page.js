@@ -2,18 +2,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/lib/AuthProvider";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import ClosingCom from "@/components/screen/home/ClosingCom";
-import AddMember from "@/components/screen/programs/members/AddMember";
-import AgentManagement from "@/components/screen/agents/EditAgents";
-import AddPaymentModal from "@/components/common/addPayment/AddPaymentModal";
 import { getData } from "@/lib/services/firebaseService";
-import { App, Select, Input, Button, Badge, Modal, Drawer } from "antd";
-import {
-  PlusOutlined, UserAddOutlined, DollarOutlined,
-  SearchOutlined, BellOutlined, MessageOutlined,
-  TeamOutlined, RiseOutlined, FallOutlined,
-  ArrowUpOutlined
-} from "@ant-design/icons";
+import { App, Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -128,12 +121,7 @@ export default function DashboardPage() {
   const [monthlyRevenue, setMonthlyRevenue] = useState([]);
   const [monthlyMembers, setMonthlyMembers] = useState([]);
   const [monthlyCollection, setMonthlyCollection] = useState(0);
-
-  // Modal / Drawer controls
-  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
-  const [isAddAgentOpen, setIsAddAgentOpen] = useState(false);
-  const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false);
-  const [isRequestsOpen, setIsRequestsOpen] = useState(false);
+  const router = useRouter();
 
   const fetchClosingCount = useCallback(async () => {
     if (!user || !selectedProgram) return;
@@ -494,10 +482,26 @@ export default function DashboardPage() {
               />
             </div>
             <div className="db-table-actions">
-              <button className="db-tbl-btn">📋 Join Fees List</button>
-              <button className="db-tbl-btn">📥 Download Certificates</button>
-              <button className="db-tbl-btn">📄 Export PDF</button>
-              <button className="db-tbl-btn">📊 Export Excel</button>
+              <button className="db-tbl-btn" onClick={() => router.push('/members')}>
+                📋 Join Fees List
+              </button>
+              <button className="db-tbl-btn" onClick={() => router.push('/members')}>
+                📥 Download Certificates
+              </button>
+              <button className="db-tbl-btn" onClick={() => router.push('/closingPayments')}>
+                📄 Export PDF
+              </button>
+              <button className="db-tbl-btn" onClick={() => {
+                const headers = ['Member,Reg No,Status,Closing Date,Group'];
+                const csv = headers.join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url;
+                a.download = 'veer-balaji-members.csv'; a.click();
+                URL.revokeObjectURL(url);
+              }}>
+                📊 Export Excel
+              </button>
             </div>
           </div>
           <div style={{ padding: "0 4px 4px" }}>
@@ -513,40 +517,6 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* ── Modals & Drawers ── */}
-      <AddMember open={isAddMemberOpen} onClose={() => setIsAddMemberOpen(false)} />
-
-      <Drawer
-        title="Agent Management"
-        width={720}
-        open={isAddAgentOpen}
-        onClose={() => setIsAddAgentOpen(false)}
-        destroyOnHidden
-      >
-        <AgentManagement
-          mode="add"
-          isAgentDrawerVisible={isAddAgentOpen}
-          setIsAgentDrawerVisible={setIsAddAgentOpen}
-          onSuccess={() => { message.success("Agent added successfully!"); setIsAddAgentOpen(false); }}
-        />
-      </Drawer>
-
-      <AddPaymentModal
-        open={isAddPaymentOpen}
-        onClose={() => setIsAddPaymentOpen(false)}
-        onSuccess={() => { message.success("Payment recorded successfully!"); setIsAddPaymentOpen(false); fetchClosingCount(); }}
-      />
-
-      <Modal
-        title="Pending Requests Overview"
-        open={isRequestsOpen}
-        onCancel={() => setIsRequestsOpen(false)}
-        footer={null}
-      >
-        <div style={{ padding: "24px", textAlign: "center", color: "#64748b" }}>
-          No pending approvals or administrative requests at this moment.
-        </div>
-      </Modal>
     </>
   );
 }
