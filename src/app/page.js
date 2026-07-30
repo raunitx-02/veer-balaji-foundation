@@ -8,7 +8,8 @@ import { getData } from "@/lib/services/firebaseService";
 import { App, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 
-const { Option } = Select;
+
+
 
 // ── Tiny SVG line chart (sparkline) ──────────────────────────────────────────
 function SparkLine({ color = "#3b82f6", fill = "rgba(59,130,246,0.12)", data = [] }) {
