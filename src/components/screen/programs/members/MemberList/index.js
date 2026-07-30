@@ -233,8 +233,7 @@ const MemberList = () => {
         try {
             const memberData = await getData(
                 `/users/${user.uid}/programs/${selectedProgram.id}/members`,
-                [{ field: 'delete_flag', operator: '==', value: false }],
-                { field: 'createdAt', direction: 'desc' }
+                [{ field: 'delete_flag', operator: '==', value: false }]
             );
             dispatch(setgetMemberDataChange(false));
             setAllMembersData(memberData);
