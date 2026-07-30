@@ -79,10 +79,10 @@ const MembershipCertificate = ({ data, selectedProgram }) => (
 
     <Header />
 
-    {/* Title pill */}
-    <View style={{ alignSelf: 'center', backgroundColor: '#8B0000', borderRadius: 3, paddingHorizontal: 24, paddingVertical: 4, marginBottom: 10 }}>
-      <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 12, color: '#fff', letterSpacing: 1 }}>
-        {data?.gender === 'Female' ? 'पुत्री-पु' : 'पुत्र-पु'}
+    {/* Title pill - Yojna Name */}
+    <View style={{ alignSelf: 'center', backgroundColor: '#8B0000', borderRadius: 12, paddingHorizontal: 24, paddingVertical: 4, marginBottom: 10 }}>
+      <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 12, color: '#fff', letterSpacing: 0.5 }}>
+        {selectedProgram?.name || selectedProgram?.hiname || 'पुत्र-पुत्री विवाह योजना'}
       </Text>
     </View>
 
@@ -239,11 +239,12 @@ const Bond = ({ data, selectedProgram }) => (
         </View>
       </View>
 
-      <View style={{ backgroundColor: '#8B0000', borderRadius: 3, paddingHorizontal: 20, paddingVertical: 3 }}>
-        <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 11, color: '#fff' }}>
-          {data?.gender === 'Female' ? 'पुत्री-पु' : 'पुत्र-पु'}
-        </Text>
-      </View>
+      {/* Title pill - Yojna Name */}
+    <View style={{ alignSelf: 'center', backgroundColor: '#8B0000', borderRadius: 12, paddingHorizontal: 24, paddingVertical: 4, marginVertical: 6 }}>
+      <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 12, color: '#fff', letterSpacing: 0.5 }}>
+        {selectedProgram?.name || selectedProgram?.hiname || 'पुत्र-पुत्री विवाह योजना'}
+      </Text>
+    </View>
 
       <View style={{ alignItems: 'flex-end' }}>
         <Text style={{ fontFamily: 'NSD', fontSize: 8, color: '#555' }}>दिनांक</Text>

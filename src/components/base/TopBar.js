@@ -253,15 +253,12 @@ const TopBar = ({ sidebarCollapsed, toggleSidebar, showNotifications, toggleNoti
           </button>
 
           {/* Breadcrumb */}
-          <nav className="hidden sm:flex items-center gap-1.5">
-            <FiGrid size={13} className="text-slate-400" />
-            <span className="breadcrumb-home">Home</span>
-            <FiChevronRight size={13} className="text-slate-300" />
-            <span className="breadcrumb-page">{pageLabel}</span>
+          <nav className="hidden lg:flex items-center gap-1.5 min-w-0 flex-shrink truncate">
+            <FiGrid size={13} className="text-slate-400 flex-shrink-0" />
+            <span className="breadcrumb-home flex-shrink-0">Home</span>
+            <FiChevronRight size={13} className="text-slate-300 flex-shrink-0" />
+            <span className="breadcrumb-page truncate">{pageLabel}</span>
           </nav>
-
-          {/* Mobile page title */}
-          <span className="sm:hidden breadcrumb-page truncate">{pageLabel}</span>
         </div>
 
         {/* Right */}
@@ -270,7 +267,7 @@ const TopBar = ({ sidebarCollapsed, toggleSidebar, showNotifications, toggleNoti
           <Select
             placeholder="Select Program"
             className="program-select"
-            style={{ width: 180 }}
+            style={{ width: 170 }}
             size="middle"
             onChange={handleProgramSelect}
             value={selectedProgram ? selectedProgram.id : undefined}
