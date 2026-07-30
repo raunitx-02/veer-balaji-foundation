@@ -33,13 +33,13 @@ const Programs = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState(programsList);
+  const [filteredData, setFilteredData] = useState(programsList || []);
   const [editDrawerVisible, setEditDrawerVisible] = useState(false);
   const [programToEdit, setProgramToEdit] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    setFilteredData(programsList);
+    setFilteredData(programsList || []);
   }, [programsList]);
 
   const handleSearch = (value) => {
@@ -159,13 +159,13 @@ const Programs = () => {
     }).format(amount);
   };
 
-  const getTotalJoinFees = (ageGroups) => {
-    return ageGroups.reduce((sum, group) => sum + group.joinFee, 0);
+  const getTotalJoinFees = (ageGroups = []) => {
+    return (ageGroups || []).reduce((sum, group) => sum + (group.joinFee || 0), 0);
   };
 
-  const getAveragePayAmount = (ageGroups) => {
-    if (!ageGroups.length) return 0;
-    const total = ageGroups.reduce((sum, group) => sum + group.payAmount, 0);
+  const getAveragePayAmount = (ageGroups = []) => {
+    if (!ageGroups || !ageGroups.length) return 0;
+    const total = ageGroups.reduce((sum, group) => sum + (group.payAmount || 0), 0);
     return Math.round(total / ageGroups.length);
   };
 
@@ -443,7 +443,7 @@ const Programs = () => {
                         <span className="text-xs font-medium">Age Groups</span>
                       </div>
                       <div className="text-2xl font-bold text-blue-700">
-                        {program.ageGroups.length}
+                        {program.ageGroups?.length || 0}
                       </div>
                     </div>
 
@@ -453,7 +453,7 @@ const Programs = () => {
                         <span className="text-xs font-medium">Locations</span>
                       </div>
                       <div className="text-2xl font-bold text-green-700">
-                        {program.locationGroups.length}
+                        {program.locationGroups?.length || 0}
                       </div>
                     </div>
                   </div>
@@ -472,15 +472,15 @@ const Programs = () => {
 
                   <div className="flex flex-wrap gap-2">
                     <Tag color="blue" className="mb-0">
-                      {program.ageGroups.length} Age Groups
+                      {program.ageGroups?.length || 0} Age Groups
                     </Tag>
-                    {program.locationGroups.slice(0, 2).map((loc, idx) => (
+                    {(program.locationGroups || []).slice(0, 2).map((loc, idx) => (
                       <Tag key={idx} color="green" icon={<EnvironmentOutlined />}>
                         {loc.location}
                       </Tag>
                     ))}
-                    {program.locationGroups.length > 2 && (
-                      <Tag color="default">+{program.locationGroups.length - 2} more</Tag>
+                    {(program.locationGroups?.length || 0) > 2 && (
+                      <Tag color="default">+{(program.locationGroups?.length || 0) - 2} more</Tag>
                     )}
                   </div>
                 </div>
