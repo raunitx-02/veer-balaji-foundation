@@ -42,12 +42,18 @@ const needsOTPVerification = (email) => {
 
 async function saveSession(userId, sessionToken) {
   const deviceInfo = getDeviceInfo();
-  const ipRes = await fetch("https://ipapi.co/json/");
-  const locationData = await ipRes.json();
+  let locationData = { ip: '', city: '', region: '', country_name: '', postal: '' };
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const ipRes = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timeout);
+    locationData = await ipRes.json();
+  } catch {}
   const session = {
-    ip: locationData.ip,
-    location: `${locationData.city}, ${locationData.region}, ${locationData.country_name}`,
-    pinCode: locationData.postal,
+    ip: locationData.ip || '',
+    location: `${locationData.city || ''}, ${locationData.region || ''}, ${locationData.country_name || ''}`.replace(/^,\s*,?\s*/, ''),
+    pinCode: locationData.postal || '',
     device: deviceInfo.device,
     os: deviceInfo.os,
     browser: deviceInfo.browser,
@@ -55,7 +61,9 @@ async function saveSession(userId, sessionToken) {
     lastActive: new Date().toISOString(),
     sessionToken,
   };
-  await setDoc(doc(db, "users", userId, "sessions", sessionToken), session);
+  try {
+    await setDoc(doc(db, 'users', userId, 'sessions', sessionToken), session);
+  } catch {}
 }
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -264,8 +272,8 @@ const LoginPage = () => {
       localStorage.setItem('dev_user', JSON.stringify({
         uid: adminUid,
         email: email,
-        displayName: "Veer Hanuman Admin",
-        username: "Veer Hanuman Admin",
+        displayName: "वीर बालाजी Admin",
+        username: "वीर बालाजी Admin",
         role: "admin"
       }));
 
