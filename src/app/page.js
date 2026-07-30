@@ -235,16 +235,7 @@ export default function DashboardPage() {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         .db-wrap { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6fb; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
         
-        /* ── Header ── */
-        .db-header { background: #fff; border-radius: 14px; padding: 14px 22px; border: 1px solid #e8ecf1; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-        .db-breadcrumb { font-size: 13px; color: #7c8db5; display: flex; align-items: center; gap: 6px; }
-        .db-breadcrumb strong { color: #1e293b; font-weight: 700; }
-        .db-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .db-scheme-sel .ant-select-selector { border-radius: 9px !important; border-color: #dde3ef !important; font-size: 13px !important; font-weight: 600 !important; }
-        .db-search .ant-input-affix-wrapper { border-radius: 9px !important; border-color: #dde3ef !important; font-size: 13px !important; }
-        .db-icon-btn { width: 36px; height: 36px; border-radius: 9px; border: 1px solid #dde3ef; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: all 0.18s; }
-        .db-icon-btn:hover { background: #f1f5f9; color: #1e293b; }
-        .db-avatar { width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(135deg, #1a0f5e, #EA1F25); color: #fff; font-weight: 800; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        /* ── Header (removed — app layout provides the top header) ── */
 
         /* ── Dashboard Title + Actions ── */
         .db-title-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
@@ -299,35 +290,7 @@ export default function DashboardPage() {
 
       <div className="db-wrap">
 
-        {/* ── Top Header Bar ── */}
-        <div className="db-header">
-          <div className="db-breadcrumb">
-            <span>Home</span><span>›</span><span>Dashboard</span>
-          </div>
-          <div className="db-header-right">
-            {programList.length > 0 && (
-              <Select
-                className="db-scheme-sel"
-                placeholder="Scheme Selector"
-                style={{ minWidth: 160 }}
-                size="middle"
-              >
-                {programList.map(p => <Option key={p.id} value={p.id}>{p.name}</Option>)}
-              </Select>
-            )}
-            <Input
-              className="db-search"
-              prefix={<SearchOutlined style={{ color: "#94a3b8" }} />}
-              placeholder="Search..."
-              style={{ width: 180 }}
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-            />
-            <div className="db-icon-btn"><BellOutlined /></div>
-            <div className="db-icon-btn"><MessageOutlined /></div>
-            <div className="db-avatar">SJ</div>
-          </div>
-        </div>
+
 
         {/* ── Dashboard Title + Action Buttons ── */}
         <div className="db-title-row">
