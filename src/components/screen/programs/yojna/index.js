@@ -21,6 +21,7 @@ import AddProgramEdit from '@/components/common/program/AddProgramEdit';
 import { deleteProgram, updateProgram } from '@/lib/services/firebaseService';
 import AddProgram from '@/components/common/program';
 import { setPrograms } from '@/redux/slices/commonSlice';
+import { useAuth } from '@/lib/AuthProvider';
 // Import your Redux action
 
 const { Panel } = Collapse;
@@ -28,6 +29,7 @@ const { Meta } = Card;
 
 const Programs = () => {
   const dispatch = useDispatch();
+  const { user } = useAuth();
   const programsList = useSelector((state) => state.data.programList);
   
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -70,7 +72,7 @@ const Programs = () => {
       setIsDeleting(true);
       
       // Delete from Firebase
-      await deleteProgram(programId);
+      await deleteProgram(user.uid, programId);
       
       // Update Redux state by filtering out the deleted program
       const updatedPrograms = programsList.filter(program => program.id !== programId);

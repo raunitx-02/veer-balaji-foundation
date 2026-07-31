@@ -76,12 +76,12 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
       // Add unique id to each age group and location group if not exists
       const ageGroupsWithId = (values.ageGroups || []).map(group => ({
         ...group,
-        id: group.id || (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2)
+        id: group.id || ((typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2))
       }));
       
       const locationGroupsWithId = (values.locationGroups || []).map(group => ({
         ...group,
-        id: group.id || (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2)
+        id: group.id || ((typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2))
       }));
 
       // Create category flags based on selected category
