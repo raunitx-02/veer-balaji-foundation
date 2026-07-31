@@ -218,12 +218,12 @@ export default function DashboardPage() {
   }, [user, selectedProgram]);
 
   useEffect(() => {
-    if (selectedProgram) {
+    if (selectedProgram?.id && user?.uid) {
       fetchClosingCount();
       fetchActivities();
       fetchMemberGrowth();
     }
-  }, [selectedProgram]);
+  }, [selectedProgram?.id, user?.uid, fetchClosingCount, fetchActivities, fetchMemberGrowth]);
 
   const activeMemberCount = selectedProgram?.memberCount || 0;
   const inactiveMemberCount = selectedProgram?.inactivemembercount || 0;
