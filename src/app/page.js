@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import ClosingCom from "@/components/screen/home/ClosingCom";
 import { getData } from "@/lib/services/firebaseService";
 import { App, Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, ArrowUpOutlined } from "@ant-design/icons";
 
 
 
