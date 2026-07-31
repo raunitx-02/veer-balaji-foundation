@@ -437,7 +437,7 @@ The Team
         placement="right"
         onClose={closeAgentDrawer}
         open={isAgentDrawerVisible}
-        width={window.innerWidth < 768 ? '100%' : 720}
+        width={typeof window !== 'undefined' && window.innerWidth < 768 ? '100%' : 720}
         maskClosable={false}
         destroyOnHidden
         extra={

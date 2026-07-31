@@ -473,7 +473,7 @@ export default function CustomDashboardLayout({ children }) {
           <TopBar
             sidebarCollapsed={sidebarCollapsed}
             toggleSidebar={() => {
-              if (window.innerWidth <= 768) {
+              if (typeof window !== 'undefined' && window.innerWidth <= 768) {
                 setMobileSidebarOpen(prev => !prev);
               } else {
                 setSidebarCollapsed(prev => !prev);
