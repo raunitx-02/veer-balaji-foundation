@@ -8,6 +8,7 @@ import { auth, db, storage } from '@/lib/firebase';
 import { setDoc, doc, collection, getDoc, updateDoc, getDocs, query, where } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import dayjs from 'dayjs';
+import { useAuth } from '@/lib/AuthProvider';
 
 const { Option } = Select;
 
@@ -21,6 +22,7 @@ const indianStates = [
 ];
 
 const AgentManagement = ({ agentData = null, mode = 'add', onSuccess,isAgentDrawerVisible ,setIsAgentDrawerVisible}) => {
+  const { user } = useAuth();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [autoPassword, setAutoPassword] = useState('');

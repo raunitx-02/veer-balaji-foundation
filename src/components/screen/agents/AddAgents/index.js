@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import { useDispatch } from 'react-redux';
 import { setgetAgentDataChange } from '@/redux/slices/commonSlice';
 import { TrsutData } from '@/lib/constentData';
+import { useAuth } from '@/lib/AuthProvider';
 
 const { Option } = Select;
 
@@ -24,6 +25,7 @@ const indianStates = [
 ];
 
 const AddAgent = () => {
+  const { user } = useAuth();
   const [isAgentDrawerVisible, setIsAgentDrawerVisible] = useState(false);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
