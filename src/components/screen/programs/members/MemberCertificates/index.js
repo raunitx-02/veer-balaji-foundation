@@ -14,11 +14,10 @@ const MemberCertificateCom = ({
     const { Title } = Typography;
     const [isLoading, setIsLoading] = React.useState(false);
   const selectedProgram = useSelector((state) => state.data.selectedProgram);
-  const agentList=useSelector((state)=>state.data.agentsList)
-    const fileName = memberData ? `${memberData.displayName.replaceAll(" ","_")+"_"+memberData?.registrationNumber || 'Member'}_Certificate.pdf` : 'Certificate.pdf';
+  const agentList = useSelector((state) => state.data.agentsList || []);
+  const fileName = memberData ? `${(memberData.displayName || '').replaceAll(" ", "_")}_${memberData?.registrationNumber || 'Member'}_Certificate.pdf` : 'Certificate.pdf';
 
-
-    const memberAgent=agentList.find((x)=>x.id===memberData?.agentId)
+  const memberAgent = (agentList || []).find((x) => x.id === memberData?.agentId);
   return (
     <div>
         <Drawer
