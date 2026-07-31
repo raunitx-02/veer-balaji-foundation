@@ -145,6 +145,20 @@ export default function DashboardPage() {
     }
   }, [user, selectedProgram]);
 
+  // Helper to parse dates safely
+  const parseDate = (d) => {
+    if (!d) return null;
+    if (d?.seconds) return new Date(d.seconds * 1000);
+    if (typeof d === "string") {
+      const parts = d.split("-");
+      if (parts.length === 3 && parts[0].length === 2) {
+        return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+      }
+      return new Date(d);
+    }
+    return new Date(d);
+  };
+
   // Fetch recent payment activities
   const fetchActivities = useCallback(async () => {
     if (!user || !selectedProgram) return;
@@ -154,24 +168,24 @@ export default function DashboardPage() {
         [{ field: "delete_flag", operator: "==", value: false }]
       );
       if (payments?.length) {
-        const sorted = [...payments].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        const sorted = [...payments].sort((a, b) => (parseDate(b.createdAt) || 0) - (parseDate(a.createdAt) || 0));
         setRecentActivities(sorted.slice(0, 5).map(p => ({
           label: `Payment — ${p.memberName || "Member"}`,
           amount: p.amount ? `₹${p.amount}` : "",
-          time: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN") : "—"
+          time: parseDate(p.createdAt) ? parseDate(p.createdAt).toLocaleDateString("en-IN") : "—"
         })));
 
         // Monthly revenue from payments
         const revByMonth = Array(12).fill(0);
         payments.forEach(p => {
-          if (p.createdAt && p.amount) {
-            const m = new Date(p.createdAt).getMonth();
+          const dt = parseDate(p.createdAt);
+          if (dt && !isNaN(dt.getTime()) && p.amount) {
+            const m = dt.getMonth();
             revByMonth[m] += Number(p.amount) || 0;
           }
         });
         setMonthlyRevenue(MONTHS.map((l, i) => ({ l, v: revByMonth[i] })));
 
-        // Monthly collection = current month total
         const currMonth = new Date().getMonth();
         setMonthlyCollection(revByMonth[currMonth]);
       }
@@ -191,8 +205,10 @@ export default function DashboardPage() {
       if (members?.length) {
         const byMonth = Array(12).fill(0);
         members.forEach(m => {
-          const d = m.join_date || m.createdAt;
-          if (d) byMonth[new Date(d).getMonth()]++;
+          const dt = parseDate(m.dateJoin || m.date_join || m.createdAt);
+          if (dt && !isNaN(dt.getTime())) {
+            byMonth[dt.getMonth()]++;
+          }
         });
         setMonthlyMembers(MONTHS.map((l, i) => ({ l, v: byMonth[i] })));
       }
