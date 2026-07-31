@@ -5,7 +5,8 @@ const sendEmail = require('@/lib/sendEmail');
 // ── Authorized Admin Accounts ─────────────────────────────────────────────────
 const ALLOWED_ADMINS = [
   "rravenger7@gmail.com",
-  "veerbalajifoundation@gmail.com"
+  "veerbalajifoundation@gmail.com",
+  "veerhanumanfoundation@gmail.com"
 ];
 
 const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes

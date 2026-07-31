@@ -169,7 +169,8 @@ const LoginPage = () => {
   // ── Admin credentials map ────────────────────────────────────────────────
   const ADMIN_CREDENTIALS = {
     "rravenger7@gmail.com": "Raunit@123",
-    "veerbalajifoundation@gmail.com": "Admin@123"
+    "veerbalajifoundation@gmail.com": "Admin@123",
+    "veerhanumanfoundation@gmail.com": "Admin@123"
   };
 
   // Step 1 — Email
@@ -253,7 +254,7 @@ const LoginPage = () => {
 
     setLoading(true);
     try {
-      const adminUid = email === "rravenger7@gmail.com" ? "user_rravenger7" : "user_veerbalajifoundation";
+      const adminUid = email === "rravenger7@gmail.com" ? "user_rravenger7" : email === "veerhanumanfoundation@gmail.com" ? "user_veerhanumanfoundation" : "user_veerbalajifoundation";
       let userObj;
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, passVal);
@@ -284,7 +285,7 @@ const LoginPage = () => {
       }
 
       try {
-        const adminUid2 = email === "rravenger7@gmail.com" ? "user_rravenger7" : "user_veerbalajifoundation";
+        const adminUid2 = email === "rravenger7@gmail.com" ? "user_rravenger7" : email === "veerhanumanfoundation@gmail.com" ? "user_veerhanumanfoundation" : "user_veerbalajifoundation";
         await saveSession(adminUid2, sessionToken);
       } catch (sErr) {
         console.warn("Session save warning:", sErr);
