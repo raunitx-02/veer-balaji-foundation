@@ -39,20 +39,21 @@ const storage = getStorage(app);
 let db;
 try {
     db = initializeFirestore(app, {
-        localCache: persistentLocalCache({
+        localCache: typeof window !== "undefined" ? persistentLocalCache({
             tabManager: persistentMultipleTabManager(),
             cacheSizeBytes: 100 * 1024 * 1024 // 100MB cache
-        })
+        }) : undefined
     });
 } catch (error) {
     console.warn("Firestore initialization fallback:", error);
 }
 
 // Enable Auth persistence
-setPersistence(auth, browserLocalPersistence)
-    .catch((error) => {
-        console.error("Auth persistence error:", error);
-    });
+if (typeof window !== "undefined") {
+    setPersistence(auth, browserLocalPersistence)
+        .catch((error) => {
+            console.error("Auth persistence error:", error);
+        });
+}
 
 export { app, auth, db, storage };
-

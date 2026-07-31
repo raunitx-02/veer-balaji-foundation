@@ -12,7 +12,7 @@ const Sessions = ({ activeTab, activeSubTab }) => {
   const [revokeSessionId, setRevokeSessionId] = useState(null);
 
   // Get current session token (assumes it's stored in user.tokens.accessToken)
-  const currentSessionToken = localStorage.getItem("session_token");
+  const currentSessionToken = typeof window !== "undefined" ? localStorage.getItem("session_token") : null;
 
   // Fetch sessions when security-sessions tab is active
   useEffect(() => {
