@@ -127,12 +127,18 @@ const ClosingCom = ({ user, selectedProgram }) => {
           { field: 'delete_flag', operator: '==', value: false },
           { field: 'marriage_flag', operator: '==', value: true },
           { field: 'status', operator: 'in', value: ['closed', 'accepted'] }
-        ],
-        { field: 'closingAt', direction: 'desc' }
+        ]
       );
-      setAllMembersData(data);
+      // Client-side sort to avoid Firestore composite index requirement
+      const sorted = [...data].sort((a, b) => {
+        const da = a.closingAt ? new Date(a.closingAt).getTime() : 0;
+        const db = b.closingAt ? new Date(b.closingAt).getTime() : 0;
+        return db - da;
+      });
+      setAllMembersData(sorted);
     } catch (e) {
-      message.error("Failed to fetch data");
+      console.warn("Closing data notice:", e.message);
+      setAllMembersData([]);
     } finally {
       setIsLoading(false);
     }

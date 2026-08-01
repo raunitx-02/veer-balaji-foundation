@@ -155,10 +155,15 @@ const TransactionsPage = () => {
       const filters = buildFirestoreFilters({ rangeStart, rangeEnd, paymentMethod, searchKeyword });
       const data = await getData(
         `/users/${user.uid}/programs/${program.id}/transactions`,
-        filters,
-        { field: 'paymentDate', direction: 'desc' }
+        filters
       );
-      setTransactions(data);
+      // Client-side sort by paymentDate desc (avoids composite index error)
+      const sortedData = [...data].sort((a, b) => {
+        const da = a.paymentDate ? new Date(a.paymentDate).getTime() : 0;
+        const db = b.paymentDate ? new Date(b.paymentDate).getTime() : 0;
+        return db - da;
+      });
+      setTransactions(sortedData);
       const totalAmount  = data.reduce((s, t) => s + (t.amount || 0), 0);
       const cashTxns     = data.filter(t => t.paymentMethod === 'cash');
       const onlineTxns   = data.filter(t => t.paymentMethod !== 'cash');
