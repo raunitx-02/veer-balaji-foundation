@@ -119,7 +119,7 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
         antdMessage.success('Program created successfully!');
       } else if (mode === 'edit' && program?.id) {
         const programRef = doc(db, "users", user.uid, "programs", program.id);
-        await updateDoc(programRef, {
+        await setDoc(programRef, {
           name: values.name,
           hiname: values.hiname,
           guname: values.guname || "",
@@ -127,12 +127,12 @@ const AddProgramEdit = ({ program, mode = 'add', onSuccess, triggerButton = null
           about: values.about,
           ...categoryFlags,
           isSelected: isSelected,
-            memberCount:parseInt(values?.memberCount) || 0,
-          inactivemembercount:parseInt(values?.inactivemembercount) || 0,
+          memberCount: parseInt(values?.memberCount) || 0,
+          inactivemembercount: parseInt(values?.inactivemembercount) || 0,
           ageGroups: ageGroupsWithId,
           locationGroups: locationGroupsWithId,
-          updatedAt: new Date(),
-        });
+          updatedAt: new Date().toISOString(),
+        }, { merge: true });
         
         antdMessage.success('Program updated successfully!');
           const programs=programList.map((item)=>{
