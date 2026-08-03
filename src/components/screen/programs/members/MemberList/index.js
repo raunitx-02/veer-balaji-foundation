@@ -198,7 +198,7 @@ const MemberList = () => {
         let out = [...data];
 
         if (s === 'active')
-            out = out.filter(m => m.status === 'accepted' && m.active_flag === true && !m.delete_flag);
+            out = out.filter(m => (m.status === 'accepted' || m.status === 'active') && m.active_flag === true && !m.delete_flag);
         else if (s === 'blocked')
             out = out.filter(m => m.status === 'blocked' && m.active_flag === false && !m.delete_flag);
 
