@@ -306,33 +306,45 @@ const MemberList = () => {
     const COL_DEFS = [
         {
             field: 'displayName', cellDataType: 'text', headerName: 'Name', pinned: 'left',
-            cellRenderer: ({ data }) => (
-                <div className={`flex items-center gap-2 relative ${data.status === 'blocked' ? 'bg-red-50' : ''}`}>
-                    <div className={`absolute -left-2.5 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${!data.joinFeesDone ? 'bg-red-500' : 'bg-green-500'}`} />
-                    <Avatar src={data.photoURL} alt={data.displayName} size={30} />
-                    <div className="flex flex-col">
-                        <span className="font-medium text-sm">{data.displayName}</span>
-                        <span className="text-xs text-gray-400">
-                            {data.status === 'blocked'  ? 'Blocked'  :
-                             data.delete_flag           ? 'Deleted'  :
-                             data.status === 'closed'   ? 'Closed'   :
-                             data.status === 'accepted' ? 'Active'   : 'Pending'}
-                            {!data.joinFeesDone && (
-                                <span className="ml-1 text-red-500 font-semibold">· Fees pending</span>
-                            )}
-                        </span>
+            cellRenderer: ({ data }) => {
+                const nameStr = data.displayName || data.name || '—';
+                return (
+                    <div className={`flex items-center gap-2 relative ${data.status === 'blocked' ? 'bg-red-50' : ''}`}>
+                        <div className={`absolute -left-2.5 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full ${!data.joinFeesDone ? 'bg-red-500' : 'bg-green-500'}`} />
+                        <Avatar src={data.photoURL} alt={nameStr} size={30} />
+                        <div className="flex flex-col">
+                            <span className="font-medium text-sm">{nameStr}</span>
+                            <span className="text-xs text-gray-400">
+                                {data.status === 'blocked'  ? 'Blocked'  :
+                                 data.delete_flag           ? 'Deleted'  :
+                                 data.status === 'closed'   ? 'Closed'   :
+                                 data.status === 'accepted' ? 'Active'   : 'Pending'}
+                                {!data.joinFeesDone && (
+                                    <span className="ml-1 text-red-500 font-semibold">· Fees pending</span>
+                                )}
+                            </span>
+                        </div>
                     </div>
-                </div>
-            )
+                );
+            }
         },
-        { field: 'fatherName',        headerName: 'Father Name',         width: 150, cellDataType: 'text' },
-        { field: 'jati',              headerName: 'Surname',             width: 150, cellDataType: 'text' },
+        { 
+            field: 'fatherName', headerName: 'Father Name', width: 150, cellDataType: 'text',
+            cellRenderer: ({ data }) => data.fatherName || data.father_name || '—'
+        },
+        { 
+            field: 'jati', headerName: 'Surname', width: 150, cellDataType: 'text',
+            cellRenderer: ({ data }) => data.jati || data.gotra || data.surname || '—'
+        },
         {
             field: 'registrationNumber', headerName: 'Reg. Number', cellDataType: 'text',
-            cellRenderer: ({ data }) => <div className="font-semibold">{data.registrationNumber || '—'}</div>
+            cellRenderer: ({ data }) => <div className="font-semibold">{data.registrationNumber || data.reg_no || '—'}</div>
         },
         { field: 'applicationNumber', headerName: 'App. Number', width: 110, cellDataType: 'text' },
-        { field: 'phone', headerName: 'Phone', width: 120, cellDataType: 'text' },
+        { 
+            field: 'phone', headerName: 'Phone', width: 120, cellDataType: 'text',
+            cellRenderer: ({ data }) => data.phone || data.mobile || '—'
+        },
         {
             field: 'gender', headerName: 'Gender', width: 100,
             cellRenderer: ({ data }) => {
@@ -341,8 +353,14 @@ const MemberList = () => {
                 return <Tag color={g === 'male' ? 'blue' : g === 'female' ? 'pink' : 'default'} className="capitalize">{g}</Tag>;
             }
         },
-        { field: 'village',       headerName: 'Village',      width: 100, cellDataType: 'text' },
-        { field: 'addedByName', headerName: 'Created By', cellRenderer: ({ data }) => <div>{data.addedByName}</div> },
+        { 
+            field: 'village', headerName: 'Village', width: 140, cellDataType: 'text',
+            cellRenderer: ({ data }) => data.village || data.address || '—'
+        },
+        { 
+            field: 'addedByName', headerName: 'Created By',
+            cellRenderer: ({ data }) => <div>{data.addedByName || data.agentName || '—'}</div>
+        },
         { field: 'aadhaarNo',   headerName: 'Aadhaar No', cellDataType: 'text' },
         {
             field: 'payAmount', headerName: 'D Amount',
