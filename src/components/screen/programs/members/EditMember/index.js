@@ -20,7 +20,7 @@ import ImgCrop from 'antd-img-crop';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 // Services Imports
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase';
 import { uploadFile } from '@/lib/services/storageService';
 import { useAuth } from '@/lib/AuthProvider';
@@ -401,6 +401,7 @@ console.log(values,'values')
         uploadPromises.push(
           uploadFile(`/users/${user.uid}/programs/${programId}/members`, photo[0].originFileObj)
             .then(result => { updatedData.photoURL = result.url; })
+            .catch(err => console.warn('Photo upload skipped/error:', err.message))
         );
       }
 
@@ -409,6 +410,7 @@ console.log(values,'values')
         uploadPromises.push(
           uploadFile(`/users/${user.uid}/programs/${programId}/members`, extraPhoto[0].originFileObj)
             .then(result => { updatedData.extraImageURL = result.url; })
+            .catch(err => console.warn('Extra photo upload skipped/error:', err.message))
         );
       } else if (!extraPhoto.length) {
         updatedData.extraImageURL = '';
@@ -419,6 +421,7 @@ console.log(values,'values')
         uploadPromises.push(
           uploadFile(`/users/${user.uid}/programs/${programId}/members`, documentFront[0].originFileObj)
             .then(result => { updatedData.documentFrontURL = result.url; })
+            .catch(err => console.warn('Doc front upload skipped/error:', err.message))
         );
       }
 
@@ -427,6 +430,7 @@ console.log(values,'values')
         uploadPromises.push(
           uploadFile(`/users/${user.uid}/programs/${programId}/members`, documentBack[0].originFileObj)
             .then(result => { updatedData.documentBackURL = result.url; })
+            .catch(err => console.warn('Doc back upload skipped/error:', err.message))
         );
       } else if (!documentBack.length) {
         updatedData.documentBackURL = '';
@@ -437,6 +441,7 @@ console.log(values,'values')
         uploadPromises.push(
           uploadFile(`/users/${user.uid}/programs/${programId}/members`, guardianDocument[0].originFileObj)
             .then(result => { updatedData.guardianDocumentURL = result.url; })
+            .catch(err => console.warn('Guardian doc upload skipped/error:', err.message))
         );
       }
 
@@ -503,7 +508,7 @@ console.log(values,'values')
 
       // Update in Firestore
       const memberDocRef = doc(db, `/users/${user.uid}/programs/${programId}/members/${memberData.id}`);
-      await updateDoc(memberDocRef, updatedMemberData);
+      await setDoc(memberDocRef, updatedMemberData, { merge: true });
 
       message.success('सदस्य सफलतापूर्वक अपडेट किया गया!');
       setOpen(false);
