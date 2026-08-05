@@ -24,10 +24,10 @@ Font.register({
 const DigitBoxRow = ({ value = '', count = 4, style = {} }) => {
   const chars = (value || '').toString().padStart(count, '0').slice(-count).split('');
   return (
-    <View style={{ flexDirection: 'row', gap: 3, ...style }}>
+    <View style={{ flexDirection: 'row', gap: 2, ...style }}>
       {chars.map((char, i) => (
-        <View key={i} style={{ width: 15, height: 17, border: '1.2pt solid #000', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 11, color: '#000' }}>{char}</Text>
+        <View key={i} style={{ width: 13, height: 15, border: '1pt solid #000', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{char}</Text>
         </View>
       ))}
     </View>
@@ -43,10 +43,10 @@ const DateBoxRow = ({ value = '', style = {} }) => {
   }
   const chars = dateStr.split('');
   return (
-    <View style={{ flexDirection: 'row', gap: 2, ...style }}>
+    <View style={{ flexDirection: 'row', gap: 1.5, ...style }}>
       {chars.map((char, i) => (
-        <View key={i} style={{ width: 12, height: 16, border: '1.2pt solid #000', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{char}</Text>
+        <View key={i} style={{ width: 11, height: 15, border: '1pt solid #000', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 9, color: '#000' }}>{char}</Text>
         </View>
       ))}
     </View>
@@ -93,18 +93,18 @@ const SingleMemberCertificate = ({ member, selectedProgram }) => {
 
         {/* DYNAMIC MEMBER OVERLAYS FOR PAGE 1 */}
 
-        {/* 1. Membership Reg Number Box (Top Left: x=24, y=134) */}
-        <View style={{ position: 'absolute', top: 134, left: 24 }}>
+        {/* 1. Membership Reg Number Box (Top Left: x=48, y=166) */}
+        <View style={{ position: 'absolute', top: 166, left: 48 }}>
           <DigitBoxRow value={regNo} count={4} />
         </View>
 
-        {/* 2. Date Box (Top Right: x=460, y=134) */}
-        <View style={{ position: 'absolute', top: 134, left: 460 }}>
+        {/* 2. Date Box (Top Right: x=476, y=166) */}
+        <View style={{ position: 'absolute', top: 166, left: 476 }}>
           <DateBoxRow value={joinDate} />
         </View>
 
-        {/* 3. Member Profile Photo (Far Right Box: x=484, y=156) */}
-        <View style={{ position: 'absolute', top: 156, left: 484, width: 88, height: 104, overflow: 'hidden', border: '1.2pt solid #000' }}>
+        {/* 3. Member Profile Photo (Far Right Box: x=491, y=199, width=86, height=116) */}
+        <View style={{ position: 'absolute', top: 199, left: 491, width: 86, height: 116, overflow: 'hidden', border: '1pt solid #333' }}>
           {member?.photoURL ? (
             <Image src={member.photoURL} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
@@ -113,54 +113,54 @@ const SingleMemberCertificate = ({ member, selectedProgram }) => {
         </View>
 
         {/* 4. Left Column Personal Details */}
-        {/* Member Name (x=70, y=154) */}
-        <View style={{ position: 'absolute', top: 154, left: 70 }}>
+        {/* Member Name (x=83, y=199) */}
+        <View style={{ position: 'absolute', top: 199, left: 83 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 11, color: '#000' }}>{name}</Text>
         </View>
 
-        {/* Date of Birth (x=95, y=172) */}
-        <View style={{ position: 'absolute', top: 172, left: 95 }}>
+        {/* Date of Birth (x=101, y=220) */}
+        <View style={{ position: 'absolute', top: 220, left: 101 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{dob}</Text>
         </View>
 
-        {/* Mobile Number (x=105, y=190) */}
-        <View style={{ position: 'absolute', top: 190, left: 105 }}>
+        {/* Mobile Number (x=107, y=241) */}
+        <View style={{ position: 'absolute', top: 241, left: 107 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{phone}</Text>
         </View>
 
-        {/* Address (x=50, y=208) */}
-        <View style={{ position: 'absolute', top: 208, left: 50, width: 220 }}>
+        {/* Address (x=65, y=263) */}
+        <View style={{ position: 'absolute', top: 263, left: 65, width: 220 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 9.5, color: '#000' }}>{address}</Text>
         </View>
 
-        {/* Guardian / Hakdar (x=90, y=228) */}
-        <View style={{ position: 'absolute', top: 228, left: isMayra ? 75 : 90 }}>
+        {/* Guardian / Hakdar (x=89, y=284) */}
+        <View style={{ position: 'absolute', top: 284, left: isMayra ? 75 : 89 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{guardian}</Text>
         </View>
 
-        {/* Agent Code (x=95, y=246) */}
-        <View style={{ position: 'absolute', top: 246, left: 95 }}>
+        {/* Agent Code (x=89, y=305) */}
+        <View style={{ position: 'absolute', top: 305, left: 89 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{agentCode}</Text>
         </View>
 
         {/* 5. Middle Column Personal Details */}
-        {/* Father / Husband Name (x=340, y=154) */}
-        <View style={{ position: 'absolute', top: 154, left: 340 }}>
+        {/* Father / Husband Name (x=410, y=199) */}
+        <View style={{ position: 'absolute', top: 199, left: 410 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10.5, color: '#000' }}>{fatherName}</Text>
         </View>
 
-        {/* Jati / Surname (x=295, y=172) */}
-        <View style={{ position: 'absolute', top: 172, left: 295 }}>
+        {/* Jati / Surname (x=372, y=220) */}
+        <View style={{ position: 'absolute', top: 220, left: 372 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{jati}</Text>
         </View>
 
-        {/* Aadhaar Number (x=335, y=190) */}
-        <View style={{ position: 'absolute', top: 190, left: 335 }}>
+        {/* Aadhaar Number (x=401, y=241) */}
+        <View style={{ position: 'absolute', top: 241, left: 401 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{aadhaar}</Text>
         </View>
 
-        {/* Relation (x=315, y=228) */}
-        <View style={{ position: 'absolute', top: 228, left: 315 }}>
+        {/* Relation (x=380, y=284) */}
+        <View style={{ position: 'absolute', top: 284, left: 380 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{relation}</Text>
         </View>
 
