@@ -20,168 +20,252 @@ Font.register({
   ]
 });
 
-// Helper to render boxed reg number (4 digits)
-const DigitBoxRow = ({ value = '', count = 4, style = {} }) => {
-  const chars = (value || '').toString().padStart(count, '0').slice(-count).split('');
+// PDF page dimensions (A4 landscape in points)
+const PW = 595.28;
+const PH = 420.94;
+
+// Image pixel dimensions
+const IW = 2000;
+const IH = 1414;
+
+// Convert pixel coordinates to PDF points
+const px = (x) => (x / IW) * PW;
+const py = (y) => (y / IH) * PH;
+
+// Reg number boxes row — 4 individual boxes
+const RegBoxRow = ({ value = '', count = 4 }) => {
+  const str = (value || '').toString().replace(/\D/g, '').padStart(count, '0').slice(-count);
+  const chars = str.split('');
   return (
-    <View style={{ flexDirection: 'row', gap: 2, ...style }}>
-      {chars.map((char, i) => (
-        <View key={i} style={{ width: 13, height: 15, border: '1pt solid #000', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{char}</Text>
+    <View style={{ flexDirection: 'row', gap: px(4) }}>
+      {chars.map((ch, i) => (
+        <View
+          key={i}
+          style={{
+            width: px(44),
+            height: py(62),
+            border: '0.5pt solid #8B0000',
+            backgroundColor: 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>
+            {ch}
+          </Text>
         </View>
       ))}
     </View>
   );
 };
 
-// Helper for date in DD0MM0YYYY format (8 boxes)
-const DateBoxRow = ({ value = '', style = {} }) => {
-  let dateStr = '01012026';
+// Date boxes row (DD MM YYYY) — 8 boxes
+const DateBoxRow = ({ value = '' }) => {
+  let str = '00000000';
   if (value) {
     const clean = value.replace(/[^0-9]/g, '');
-    if (clean.length === 8) dateStr = clean;
+    if (clean.length === 8) str = clean;
+    else if (value.match(/^\d{2}-\d{2}-\d{4}$/)) {
+      str = value.replace(/-/g, '');
+    }
   }
-  const chars = dateStr.split('');
+  const chars = str.split('');
   return (
-    <View style={{ flexDirection: 'row', gap: 1.5, ...style }}>
-      {chars.map((char, i) => (
-        <View key={i} style={{ width: 11, height: 15, border: '1pt solid #000', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 9, color: '#000' }}>{char}</Text>
+    <View style={{ flexDirection: 'row', gap: px(3) }}>
+      {chars.map((ch, i) => (
+        <View
+          key={i}
+          style={{
+            width: px(36),
+            height: py(62),
+            border: '0.5pt solid #8B0000',
+            backgroundColor: 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 9, color: '#000' }}>
+            {ch}
+          </Text>
         </View>
       ))}
     </View>
   );
 };
 
-// Single Member 2-Page Certificate Component
+// Absolute overlay text helper
+const Overlay = ({ x, y, children, style = {} }) => (
+  <View style={{ position: 'absolute', left: px(x), top: py(y), zIndex: 10, ...style }}>
+    {children}
+  </View>
+);
+
+// Single Member 2-Page Certificate
 const SingleMemberCertificate = ({ member, selectedProgram }) => {
   const programName = selectedProgram?.name || selectedProgram?.hiname || member?.programName || '';
-  
+
   let page1Bg = suraksha_page1Bg;
   let page2Bg = suraksha_page2Bg;
-  let isMayra = false;
 
   if (programName.includes('मायरा') || selectedProgram?.isMamera || member?.isMamera) {
     page1Bg = mayra_page1Bg;
     page2Bg = mayra_page2Bg;
-    isMayra = true;
   } else if (programName.includes('विवाह') || selectedProgram?.isVivah || member?.isVivah) {
     page1Bg = vivah_page1Bg;
     page2Bg = vivah_page2Bg;
   }
 
-  // Dynamic values bound strictly to member details
-  const regNo = member?.applicationNumber || member?.registrationNumber || member?.regNo || '000';
-  const joinDate = member?.dateJoin || member?.createdAt || '01-08-2026';
-  const name = member?.displayName || member?.name || '';
-  const fatherName = member?.fatherName || member?.father_name || '';
-  const dob = member?.bobDate || member?.dob || '';
-  const jati = member?.jati || member?.gotra || member?.surname || '';
-  const phone = member?.phone || member?.mobile || '';
-  const aadhaar = member?.aadhaarNo || member?.aadhaar || '';
-  const address = member?.address || member?.currentAddress || member?.village || '';
-  const guardian = member?.guardian || '';
-  const relation = member?.guardianRelation || '';
-  const agentCode = member?.agentCode || member?.agentId || 'VB1001';
+  // Member field values – using exact Firestore field names
+  const regNo         = member?.registrationNumber || member?.applicationNumber || member?.regNo || '';
+  const joinDate      = member?.dateJoin || member?.createdAt || '';
+  const name          = member?.displayName || member?.name || '';
+  const fatherName    = member?.fatherName || '';
+  const dob           = member?.bobDate || member?.dob || '';
+  const gotra         = member?.gotra || member?.jati || '';
+  const phone         = member?.phone || member?.mobile || '';
+  const aadhaar       = member?.aadhaarNo || '';
+  const address       = member?.currentAddress || member?.address || '';
+  const village       = member?.village || '';
+  const fullAddress   = address && village ? `${address}, ${village}` : (address || village || '');
+  const guardian      = member?.guardian || '';
+  const relation      = member?.guardianRelation || '';
+  const agentCode     = member?.agentCode || member?.agentId || '';
+  const photoURL      = member?.photoURL || null;
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Pixel layout of template (1.png at 2000×1414):
+  //
+  //  Header block: y 0–430
+  //  "सदस्यता क्रमांक" label: x~78, y~438
+  //  Reg boxes row starts: x~50, y~470  → 4 boxes each ~44px wide, gap 4px
+  //  "दिनांक" label: x~1630, y~438
+  //  Date boxes row starts: x~1592, y~470 → 8 boxes each ~36px wide
+  //
+  //  नाम dotted line after label: label ends ~x285, value starts ~x295, y~590
+  //  जन्म तिथि dotted line: value starts ~x295, y~656
+  //  मोबाइल न. dotted line: value starts ~x295, y~722
+  //  पता dotted line: value starts ~x120, y~788 (wide field)
+  //  वारिसदार dotted line: value starts ~x250, y~852
+  //  एजेंट कोड dotted line: value starts ~x248, y~918
+  //
+  //  पिता का नाम: value starts ~x1090, y~590
+  //  गौत्र: value starts ~x1090, y~656
+  //  आधार संख्या: value starts ~x1090, y~722
+  //  सम्बन्ध: value starts ~x1090, y~852
+  //
+  //  Photo box: x~1680–1930, y~570–900
+  // ──────────────────────────────────────────────────────────────────────
+
+  const fs = { fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10.5, color: '#1a1a1a' };
+  const fsSmall = { fontFamily: 'NSD', fontWeight: 'bold', fontSize: 9.5, color: '#1a1a1a' };
 
   return (
     <>
-      {/* ── PAGE 1: Main Certificate Details Page (1.png / 3.png / 5.png) ────────── */}
-      <Page size={[595.28, 420.94]} style={{ padding: 0, position: 'relative' }}>
-        {/* Background Official Certificate Template */}
-        <Image src={page1Bg} style={{ position: 'absolute', top: 0, left: 0, width: 595.28, height: 420.94 }} />
+      {/* ── PAGE 1: Main details page ─────────────────────────────────── */}
+      <Page size={[PW, PH]} style={{ padding: 0, position: 'relative', backgroundColor: '#fff' }}>
+        {/* Background template */}
+        <Image
+          src={page1Bg}
+          style={{ position: 'absolute', top: 0, left: 0, width: PW, height: PH }}
+        />
 
-        {/* DYNAMIC MEMBER OVERLAYS FOR PAGE 1 */}
+        {/* ── Reg Number Boxes ── */}
+        <Overlay x={50} y={470}>
+          <RegBoxRow value={regNo} count={4} />
+        </Overlay>
 
-        {/* 1. Membership Reg Number Box (Top Left: x=48, y=166) */}
-        <View style={{ position: 'absolute', top: 166, left: 48, zIndex: 10 }}>
-          <DigitBoxRow value={regNo} count={4} />
-        </View>
-
-        {/* 2. Date Box (Top Right: x=476, y=166) */}
-        <View style={{ position: 'absolute', top: 166, left: 476, zIndex: 10 }}>
+        {/* ── Date Boxes ── */}
+        <Overlay x={1592} y={470}>
           <DateBoxRow value={joinDate} />
-        </View>
+        </Overlay>
 
-        {/* 3. Member Profile Photo (Far Right Box: x=491, y=199, width=86, height=116) */}
-        <View style={{ position: 'absolute', top: 199, left: 491, width: 86, height: 116, overflow: 'hidden', border: '1pt solid #333', zIndex: 10 }}>
-          {member?.photoURL ? (
-            <Image src={member.photoURL} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        {/* ── Member Photo Box ── */}
+        <Overlay x={1680} y={570} style={{ width: px(250), height: py(330) }}>
+          {photoURL ? (
+            <Image
+              src={photoURL}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
           ) : (
-            <View style={{ width: '100%', height: '100%', backgroundColor: '#eee' }} />
+            <View style={{ width: '100%', height: '100%', backgroundColor: '#f0f0f0' }} />
           )}
-        </View>
+        </Overlay>
 
-        {/* 4. Left Column Personal Details */}
-        {/* Member Name (x=83, y=199) */}
-        <View style={{ position: 'absolute', top: 199, left: 83, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 11, color: '#000' }}>{name}</Text>
-        </View>
+        {/* ── नाम (Name) ── */}
+        <Overlay x={295} y={592}>
+          <Text style={fs}>{name}</Text>
+        </Overlay>
 
-        {/* Date of Birth (x=101, y=220) */}
-        <View style={{ position: 'absolute', top: 220, left: 101, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{dob}</Text>
-        </View>
+        {/* ── जन्म तिथि (DOB) ── */}
+        <Overlay x={295} y={658}>
+          <Text style={fs}>{dob}</Text>
+        </Overlay>
 
-        {/* Mobile Number (x=107, y=241) */}
-        <View style={{ position: 'absolute', top: 241, left: 107, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{phone}</Text>
-        </View>
+        {/* ── मोबाइल न. (Phone) ── */}
+        <Overlay x={295} y={724}>
+          <Text style={fs}>{phone}</Text>
+        </Overlay>
 
-        {/* Address (x=65, y=263) */}
-        <View style={{ position: 'absolute', top: 263, left: 65, width: 220, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 9.5, color: '#000' }}>{address}</Text>
-        </View>
+        {/* ── पता (Address) – full width dotted line ── */}
+        <Overlay x={120} y={790} style={{ width: px(1530) }}>
+          <Text style={{ ...fsSmall, flexWrap: 'wrap' }}>{fullAddress}</Text>
+        </Overlay>
 
-        {/* Guardian / Hakdar (x=89, y=284) */}
-        <View style={{ position: 'absolute', top: 284, left: isMayra ? 75 : 89, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{guardian}</Text>
-        </View>
+        {/* ── वारिसदार (Guardian) ── */}
+        <Overlay x={250} y={852}>
+          <Text style={fs}>{guardian}</Text>
+        </Overlay>
 
-        {/* Agent Code (x=89, y=305) */}
-        <View style={{ position: 'absolute', top: 305, left: 89, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{agentCode}</Text>
-        </View>
+        {/* ── एजेंट कोड (Agent Code) ── */}
+        <Overlay x={248} y={918}>
+          <Text style={fs}>{agentCode}</Text>
+        </Overlay>
 
-        {/* 5. Middle Column Personal Details */}
-        {/* Father / Husband Name (x=410, y=199) */}
-        <View style={{ position: 'absolute', top: 199, left: 410, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10.5, color: '#000' }}>{fatherName}</Text>
-        </View>
+        {/* ── पिता का नाम (Father Name) ── */}
+        <Overlay x={1090} y={592}>
+          <Text style={{ ...fs, maxWidth: px(540) }}>{fatherName}</Text>
+        </Overlay>
 
-        {/* Jati / Surname (x=372, y=220) */}
-        <View style={{ position: 'absolute', top: 220, left: 372, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{jati}</Text>
-        </View>
+        {/* ── गौत्र (Gotra/Jati) ── */}
+        <Overlay x={1090} y={658}>
+          <Text style={fs}>{gotra}</Text>
+        </Overlay>
 
-        {/* Aadhaar Number (x=401, y=241) */}
-        <View style={{ position: 'absolute', top: 241, left: 401, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{aadhaar}</Text>
-        </View>
+        {/* ── आधार संख्या (Aadhaar) ── */}
+        <Overlay x={1090} y={724}>
+          <Text style={fs}>{aadhaar}</Text>
+        </Overlay>
 
-        {/* Relation (x=380, y=284) */}
-        <View style={{ position: 'absolute', top: 284, left: 380, zIndex: 10 }}>
-          <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{relation}</Text>
-        </View>
+        {/* ── सम्बन्ध (Relation) ── */}
+        <Overlay x={1090} y={852}>
+          <Text style={fs}>{relation}</Text>
+        </Overlay>
 
       </Page>
 
-      {/* ── PAGE 2: Rules & Conditions Page (2.png / 4.png / 6.png) ───────────── */}
-      <Page size={[595.28, 420.94]} style={{ padding: 0, position: 'relative' }}>
-        <Image src={page2Bg} style={{ position: 'absolute', top: 0, left: 0, width: 595.28, height: 420.94 }} />
+      {/* ── PAGE 2: Terms & Conditions (static) ──────────────────────── */}
+      <Page size={[PW, PH]} style={{ padding: 0, position: 'relative', backgroundColor: '#fff' }}>
+        <Image
+          src={page2Bg}
+          style={{ position: 'absolute', top: 0, left: 0, width: PW, height: PH }}
+        />
       </Page>
     </>
   );
 };
 
-// Document Container for single or multiple members
+// Document wrapper — handles single member or array of members
 const CertificateComServerSide = ({ data, selectedProgram }) => {
   const membersList = Array.isArray(data) ? data : [data];
 
   return (
     <Document>
       {membersList.map((m, idx) => (
-        <SingleMemberCertificate key={m?.id || idx} member={m} selectedProgram={selectedProgram} />
+        <SingleMemberCertificate
+          key={m?.id || idx}
+          member={m}
+          selectedProgram={selectedProgram}
+        />
       ))}
     </Document>
   );
