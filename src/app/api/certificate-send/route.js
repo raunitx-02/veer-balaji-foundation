@@ -73,8 +73,12 @@ async function drawCertificatePage(doc, member, agentCode, schemeType) {
   // Logo
   const logoPath = path.join(process.cwd(), "public/veer-balaji-logo.png");
   if (fs.existsSync(logoPath)) {
-    doc.image(logoPath, 14, 13, { width: 145, height: 145 });
-    doc.y = 0; doc.x = 0;
+    try {
+      doc.image(logoPath, 14, 13, { width: 145, height: 145 });
+      doc.y = 0; doc.x = 0;
+    } catch (e) {
+      console.error("Logo draw error:", e.message);
+    }
   }
 
   // Main title
@@ -186,15 +190,8 @@ async function drawCertificatePage(doc, member, agentCode, schemeType) {
   // 4. FIELDS SECTION  (y: 218 → 490)
   // ══════════════════════════════════════════════════════════════════════════
 
-  // Layout columns:
-  //   Left column:    x=14 .. 380   (labels + values)
-  //   Right column:   x=395 .. 640  (labels + values)
-  //   Photo box:      x=655 .. 830
-
   const LX  = 14;    // left label x
   const LVX = 100;   // left value x
-  const LW  = 255;   // left value max width
-
   const RX  = 395;   // right label x
   const RVX = 510;   // right value x
   const RW  = 140;   // right value max width
@@ -225,8 +222,16 @@ async function drawCertificatePage(doc, member, agentCode, schemeType) {
     try {
       let buf;
       if (photoURL.startsWith("http")) {
-        const res = await fetch(photoURL);
-        if (res.ok) buf = Buffer.from(await res.arrayBuffer());
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3000);
+        try {
+          const res = await fetch(photoURL, { signal: controller.signal });
+          clearTimeout(timer);
+          if (res.ok) buf = Buffer.from(await res.arrayBuffer());
+        } catch (err) {
+          clearTimeout(timer);
+          console.error("Photo fetch error:", err.message);
+        }
       } else if (photoURL.startsWith("data:")) {
         buf = Buffer.from(photoURL.split(",")[1], "base64");
       }
@@ -239,7 +244,7 @@ async function drawCertificatePage(doc, member, agentCode, schemeType) {
         doc.y = 0; doc.x = 0;
       }
     } catch (e) {
-      console.error("Photo error:", e.message);
+      console.error("Photo image render error:", e.message);
     }
   }
 
@@ -392,7 +397,6 @@ function drawTermsPage(doc, schemeType) {
   doc.font("NSD-Bold").fontSize(13).fillColor(MAROON);
   t(doc, "योगदान से संबंधित नियम और योजना के लाभ:", 20, 70);
 
-  // Terms list
   const vivahTerms = [
     "इस योजना का लाभ सदस्यता तिथि से 12 माह बाद मिलना प्रारंभ होगा ।",
     "सदस्यों को नियमानुसार सहयोग राशि जमा करवाना अनिवार्य है ।",
@@ -453,11 +457,19 @@ function drawTermsPage(doc, schemeType) {
 // ─── POST handler ────────────────────────────────────────────────────────────
 export async function POST(req) {
   try {
-    const { memberData, selectedProgram } = await req.json();
+    const body = await req.json();
+    const { memberData, selectedProgram } = body;
 
     const PDFDocument = (await import("pdfkit")).default;
 
-    const members = Array.isArray(memberData) ? memberData : [memberData];
+    const members = Array.isArray(memberData) ? memberData : (memberData ? [memberData] : []);
+
+    if (members.length === 0) {
+      return NextResponse.json(
+        { error: "No member data provided" },
+        { status: 400, headers: corsHeaders }
+      );
+    }
 
     // Determine scheme type
     const programName =
