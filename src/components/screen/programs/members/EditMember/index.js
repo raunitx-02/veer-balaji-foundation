@@ -217,25 +217,31 @@ useEffect(() => {
     
     setAddedBy(memberData.addedBy || 'admin');
 
-    // Set form values
+    // Set form values with fallbacks
+    const parseFormDate = (d) => {
+      if (!d) return null;
+      const parsed = dayjs(d, ['DD-MM-YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', undefined]);
+      return parsed.isValid() ? parsed : null;
+    };
+
     const formValues = {
-      displayName: memberData.displayName,
-      fatherName: memberData.fatherName,
-      guardian: memberData.guardian,
-      guardianRelation: memberData.guardianRelation,
-      gender: memberData.gender,
-      jati: memberData.jati,
+      displayName: memberData.displayName || memberData.name || '',
+      fatherName: memberData.fatherName || memberData.father_name || '',
+      guardian: memberData.guardian || '',
+      guardianRelation: memberData.guardianRelation || '',
+      gender: memberData.gender || 'male',
+      jati: memberData.jati || memberData.gotra || memberData.surname || '',
       gotra: memberData.gotra || '',
-      phone: memberData.phone,
+      phone: memberData.phone || memberData.mobile || '',
       phoneAlt: memberData.phoneAlt || '',
-      aadhaarNo: memberData.aadhaarNo,
-      bobDate: memberData.bobDate ? dayjs(memberData.bobDate, 'DD-MM-YYYY') : null,
-      dateJoin: dateJoin,
-      currentAddress: memberData.currentAddress,
-      village: memberData.village,
-      state: memberData.state,
-      district: memberData.district,
-      pinCode: memberData.pinCode,
+      aadhaarNo: memberData.aadhaarNo || memberData.aadhaar || '',
+      bobDate: parseFormDate(memberData.bobDate || memberData.dob),
+      dateJoin: dateJoin.isValid() ? dateJoin : dayjs(),
+      currentAddress: memberData.currentAddress || memberData.address || '',
+      village: memberData.village || memberData.address || '',
+      state: memberData.state || '',
+      district: memberData.district || '',
+      pinCode: memberData.pinCode || '',
       program: memberData.programId,
       ageGroup: memberData.ageGroup,
       closingMonths: memberData.closingMonths || 0,
@@ -466,24 +472,39 @@ console.log(values,'values')
         }
       }
 
+      // Safe date formatting helper
+      const formatDateVal = (val) => {
+        if (!val) return dayjs().format('DD-MM-YYYY');
+        if (typeof val?.format === 'function') return val.format('DD-MM-YYYY');
+        const parsed = dayjs(val, ['DD-MM-YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', undefined]);
+        return parsed.isValid() ? parsed.format('DD-MM-YYYY') : dayjs().format('DD-MM-YYYY');
+      };
+
       // Update member data
       const updatedMemberData = {
         ...updatedData,
-        displayName: values.displayName,
-        dateJoin: values.dateJoin.format('DD-MM-YYYY'),
-        fatherName: values.fatherName,
-        guardian: values.guardian,
-        guardianRelation: values.guardianRelation,
-        gender: values.gender,
-        jati: values.jati,
+        displayName: values.displayName || memberData.displayName || memberData.name || '',
+        name: values.displayName || memberData.name || '',
+        dateJoin: formatDateVal(values.dateJoin),
+        fatherName: values.fatherName || '',
+        father_name: values.fatherName || '',
+        guardian: values.guardian || '',
+        guardianRelation: values.guardianRelation || '',
+        gender: values.gender || 'male',
+        jati: values.jati || '',
+        surname: values.jati || '',
         gotra: values.gotra || '',
-        phone: values.phone,
+        phone: values.phone || '',
+        mobile: values.phone || '',
         phoneAlt: values.phoneAlt || '',
-        aadhaarNo: values.aadhaarNo,
+        aadhaarNo: values.aadhaarNo || '',
+        aadhaar: values.aadhaarNo || '',
         applicationNumber: values.applicationNumber || "",
-        bobDate: values.bobDate.format('DD-MM-YYYY'),
-        currentAddress: values.currentAddress,
-        village: values.village,
+        bobDate: formatDateVal(values.bobDate),
+        dob: formatDateVal(values.bobDate),
+        currentAddress: values.currentAddress || '',
+        address: values.currentAddress || values.village || '',
+        village: values.village || '',
         state: values.state,
         district: values.district,
         pinCode: values.pinCode,
