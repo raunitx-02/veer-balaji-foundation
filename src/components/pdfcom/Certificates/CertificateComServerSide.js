@@ -89,22 +89,22 @@ const SingleMemberCertificate = ({ member, selectedProgram }) => {
       {/* ── PAGE 1: Main Certificate Details Page (1.png / 3.png / 5.png) ────────── */}
       <Page size={[595.28, 420.94]} style={{ padding: 0, position: 'relative' }}>
         {/* Background Official Certificate Template */}
-        <Image src={page1Bg} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+        <Image src={page1Bg} style={{ position: 'absolute', top: 0, left: 0, width: 595.28, height: 420.94 }} />
 
         {/* DYNAMIC MEMBER OVERLAYS FOR PAGE 1 */}
 
         {/* 1. Membership Reg Number Box (Top Left: x=48, y=166) */}
-        <View style={{ position: 'absolute', top: 166, left: 48 }}>
+        <View style={{ position: 'absolute', top: 166, left: 48, zIndex: 10 }}>
           <DigitBoxRow value={regNo} count={4} />
         </View>
 
         {/* 2. Date Box (Top Right: x=476, y=166) */}
-        <View style={{ position: 'absolute', top: 166, left: 476 }}>
+        <View style={{ position: 'absolute', top: 166, left: 476, zIndex: 10 }}>
           <DateBoxRow value={joinDate} />
         </View>
 
         {/* 3. Member Profile Photo (Far Right Box: x=491, y=199, width=86, height=116) */}
-        <View style={{ position: 'absolute', top: 199, left: 491, width: 86, height: 116, overflow: 'hidden', border: '1pt solid #333' }}>
+        <View style={{ position: 'absolute', top: 199, left: 491, width: 86, height: 116, overflow: 'hidden', border: '1pt solid #333', zIndex: 10 }}>
           {member?.photoURL ? (
             <Image src={member.photoURL} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
@@ -114,53 +114,53 @@ const SingleMemberCertificate = ({ member, selectedProgram }) => {
 
         {/* 4. Left Column Personal Details */}
         {/* Member Name (x=83, y=199) */}
-        <View style={{ position: 'absolute', top: 199, left: 83 }}>
+        <View style={{ position: 'absolute', top: 199, left: 83, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 11, color: '#000' }}>{name}</Text>
         </View>
 
         {/* Date of Birth (x=101, y=220) */}
-        <View style={{ position: 'absolute', top: 220, left: 101 }}>
+        <View style={{ position: 'absolute', top: 220, left: 101, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{dob}</Text>
         </View>
 
         {/* Mobile Number (x=107, y=241) */}
-        <View style={{ position: 'absolute', top: 241, left: 107 }}>
+        <View style={{ position: 'absolute', top: 241, left: 107, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{phone}</Text>
         </View>
 
         {/* Address (x=65, y=263) */}
-        <View style={{ position: 'absolute', top: 263, left: 65, width: 220 }}>
+        <View style={{ position: 'absolute', top: 263, left: 65, width: 220, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 9.5, color: '#000' }}>{address}</Text>
         </View>
 
         {/* Guardian / Hakdar (x=89, y=284) */}
-        <View style={{ position: 'absolute', top: 284, left: isMayra ? 75 : 89 }}>
+        <View style={{ position: 'absolute', top: 284, left: isMayra ? 75 : 89, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{guardian}</Text>
         </View>
 
         {/* Agent Code (x=89, y=305) */}
-        <View style={{ position: 'absolute', top: 305, left: 89 }}>
+        <View style={{ position: 'absolute', top: 305, left: 89, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{agentCode}</Text>
         </View>
 
         {/* 5. Middle Column Personal Details */}
         {/* Father / Husband Name (x=410, y=199) */}
-        <View style={{ position: 'absolute', top: 199, left: 410 }}>
+        <View style={{ position: 'absolute', top: 199, left: 410, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10.5, color: '#000' }}>{fatherName}</Text>
         </View>
 
         {/* Jati / Surname (x=372, y=220) */}
-        <View style={{ position: 'absolute', top: 220, left: 372 }}>
+        <View style={{ position: 'absolute', top: 220, left: 372, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{jati}</Text>
         </View>
 
         {/* Aadhaar Number (x=401, y=241) */}
-        <View style={{ position: 'absolute', top: 241, left: 401 }}>
+        <View style={{ position: 'absolute', top: 241, left: 401, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{aadhaar}</Text>
         </View>
 
         {/* Relation (x=380, y=284) */}
-        <View style={{ position: 'absolute', top: 284, left: 380 }}>
+        <View style={{ position: 'absolute', top: 284, left: 380, zIndex: 10 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{relation}</Text>
         </View>
 
@@ -168,7 +168,7 @@ const SingleMemberCertificate = ({ member, selectedProgram }) => {
 
       {/* ── PAGE 2: Rules & Conditions Page (2.png / 4.png / 6.png) ───────────── */}
       <Page size={[595.28, 420.94]} style={{ padding: 0, position: 'relative' }}>
-        <Image src={page2Bg} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+        <Image src={page2Bg} style={{ position: 'absolute', top: 0, left: 0, width: 595.28, height: 420.94 }} />
       </Page>
     </>
   );
