@@ -489,6 +489,7 @@ export async function POST(req) {
       size: [W, H],
       autoFirstPage: false,
       margin: 0,
+      font: fontReg,
     });
 
     doc.registerFont("NSD",      fontReg);
