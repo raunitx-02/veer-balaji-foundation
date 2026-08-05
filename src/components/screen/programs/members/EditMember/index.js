@@ -576,7 +576,9 @@ const handleDateOfBirthChange = (date) => {
       };
 
       // Update in Firestore
-      const memberDocRef = doc(db, `/users/${user.uid}/programs/${programId}/members/${memberData.id}`);
+      const targetAdminUid = user?.uid || memberData?.createdBy || 'admin';
+      const targetProgramId = programId || memberData?.programId;
+      const memberDocRef = doc(db, 'users', targetAdminUid, 'programs', targetProgramId, 'members', memberData.id);
       await setDoc(memberDocRef, updatedMemberData, { merge: true });
 
       message.success('सदस्य सफलतापूर्वक अपडेट किया गया!');
