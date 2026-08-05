@@ -38,22 +38,11 @@ const QUICK_RANGES = {
 };
 
 // ─── Firestore filter builder ────────────────────────────────────────────────
-function buildFirestoreFilters({ rangeStart, rangeEnd, paymentMethod, searchKeyword }) {
-  const filters = [
+function buildFirestoreFilters() {
+  return [
     { field: 'active_flag', operator: '==', value: true },
     { field: 'delete_flag', operator: '==', value: false },
   ];
-  if (rangeStart && rangeEnd) {
-    filters.push({ field: 'paymentDate', operator: '>=', value: rangeStart.toISOString() });
-    filters.push({ field: 'paymentDate', operator: '<=', value: rangeEnd.toISOString() });
-  }
-  if (paymentMethod && paymentMethod !== 'all') {
-    filters.push({ field: 'paymentMethod', operator: '==', value: paymentMethod });
-  }
-  if (searchKeyword && searchKeyword.trim().length > 0) {
-    filters.push({ field: 'search_keywords', operator: 'array-contains', value: searchKeyword.trim().toLowerCase() });
-  }
-  return filters;
 }
 
 // ─── CSV export ──────────────────────────────────────────────────────────────
@@ -152,25 +141,56 @@ const TransactionsPage = () => {
     }
     setLoading(true);
     try {
-      const filters = buildFirestoreFilters({ rangeStart, rangeEnd, paymentMethod, searchKeyword });
-      const data = await getData(
+      const filters = buildFirestoreFilters();
+      const rawData = await getData(
         `/users/${user.uid}/programs/${program.id}/transactions`,
         filters
       );
-      // Client-side sort by paymentDate desc (avoids composite index error)
-      const sortedData = [...data].sort((a, b) => {
+      
+      let data = [...rawData];
+
+      // Client-side date range filtering (avoids Firestore composite index requirement)
+      if (rangeStart && rangeEnd) {
+        const startTs = rangeStart.valueOf();
+        const endTs = rangeEnd.valueOf();
+        data = data.filter(t => {
+          if (!t.paymentDate) return false;
+          const tTime = new Date(t.paymentDate).getTime();
+          return tTime >= startTs && tTime <= endTs;
+        });
+      }
+
+      // Client-side payment method filtering
+      if (paymentMethod && paymentMethod !== 'all') {
+        data = data.filter(t => t.paymentMethod === paymentMethod);
+      }
+
+      // Client-side search keyword filtering
+      if (searchKeyword && searchKeyword.trim().length > 0) {
+        const kw = searchKeyword.trim().toLowerCase();
+        data = data.filter(t => 
+          (t.transactionNumber && t.transactionNumber.toLowerCase().includes(kw)) ||
+          (t.payerName && t.payerName.toLowerCase().includes(kw)) ||
+          (t.beneficiaryName && t.beneficiaryName.toLowerCase().includes(kw)) ||
+          (t.payerPhone && t.payerPhone.toLowerCase().includes(kw))
+        );
+      }
+
+      // Client-side sort by paymentDate desc
+      const sortedData = data.sort((a, b) => {
         const da = a.paymentDate ? new Date(a.paymentDate).getTime() : 0;
         const db = b.paymentDate ? new Date(b.paymentDate).getTime() : 0;
         return db - da;
       });
+
       setTransactions(sortedData);
-      const totalAmount  = data.reduce((s, t) => s + (t.amount || 0), 0);
-      const cashTxns     = data.filter(t => t.paymentMethod === 'cash');
-      const onlineTxns   = data.filter(t => t.paymentMethod !== 'cash');
+      const totalAmount  = sortedData.reduce((s, t) => s + (t.amount || 0), 0);
+      const cashTxns     = sortedData.filter(t => t.paymentMethod === 'cash');
+      const onlineTxns   = sortedData.filter(t => t.paymentMethod !== 'cash');
       const cashAmount   = cashTxns.reduce((s, t) => s + (t.amount || 0), 0);
       const onlineAmount = onlineTxns.reduce((s, t) => s + (t.amount || 0), 0);
       setSummary({
-        totalAmount, totalTransactions: data.length,
+        totalAmount, totalTransactions: sortedData.length,
         cashCount: cashTxns.length, onlineCount: onlineTxns.length, cashAmount, onlineAmount
       });
     } catch (err) {
