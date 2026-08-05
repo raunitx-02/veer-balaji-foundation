@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Drawer, Form, Input, InputNumber, Select, Space, Card, Typography, App, Radio, message } from 'antd';
 import { FiPlusCircle, FiTrash2, FiUser, FiMapPin, FiDollarSign, FiCalendar, FiTag, FiEdit2, FiSave } from 'react-icons/fi';
 import { useAuth } from '@/lib/AuthProvider';
-import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { setgetMemberDataChange, setPrograms } from '@/redux/slices/commonSlice';
 import { useDispatch, useSelector } from 'react-redux';

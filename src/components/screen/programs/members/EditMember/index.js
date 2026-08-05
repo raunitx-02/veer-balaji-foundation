@@ -335,11 +335,12 @@ const handleDateOfBirthChange = (date) => {
   // Handle upload changes with cropping support
   const handleUploadChange = (setter) => ({ fileList }) => {
     const updatedFileList = fileList.map(file => {
-      if (file.originFileObj instanceof File) {
+      const rawFile = file.originFileObj || (file instanceof File ? file : null);
+      if (rawFile) {
         return {
           ...file,
-          originFileObj: file.originFileObj,
-          url: file.url || URL.createObjectURL(file.originFileObj)
+          originFileObj: rawFile,
+          url: file.url || (typeof window !== 'undefined' ? URL.createObjectURL(rawFile) : undefined)
         };
       }
       return file;
@@ -395,27 +396,41 @@ const handleDateOfBirthChange = (date) => {
   // Form submission
   const onFinish = async (values) => {
     setLoading(true);
-console.log(values,'values')
     try {
       const updatedData = { ...memberData };
+      const targetUid = user?.uid || memberData?.createdBy || 'admin';
+      const folderPath = `users/${targetUid}/programs/${programId}/members`;
+
+      const getFileToUpload = (list) => {
+        if (!list || !list.length) return null;
+        const item = list[0];
+        if (item.originFileObj) return item.originFileObj;
+        if (item instanceof File) return item;
+        if (item.file) return item.file;
+        return null;
+      };
 
       // Handle file uploads - only upload new files
       const uploadPromises = [];
 
       // Photo
-      if (photo.length && photo[0].originFileObj) {
+      const photoFile = getFileToUpload(photo);
+      if (photoFile) {
         uploadPromises.push(
-          uploadFile(`/users/${user.uid}/programs/${programId}/members`, photo[0].originFileObj)
-            .then(result => { updatedData.photoURL = result.url; })
+          uploadFile(folderPath, photoFile)
+            .then(result => { if (result.url) updatedData.photoURL = result.url; })
             .catch(err => console.warn('Photo upload skipped/error:', err.message))
         );
+      } else if (!photo.length) {
+        updatedData.photoURL = '';
       }
 
       // Extra Photo
-      if (extraPhoto.length && extraPhoto[0].originFileObj) {
+      const extraPhotoFile = getFileToUpload(extraPhoto);
+      if (extraPhotoFile) {
         uploadPromises.push(
-          uploadFile(`/users/${user.uid}/programs/${programId}/members`, extraPhoto[0].originFileObj)
-            .then(result => { updatedData.extraImageURL = result.url; })
+          uploadFile(folderPath, extraPhotoFile)
+            .then(result => { if (result.url) updatedData.extraImageURL = result.url; })
             .catch(err => console.warn('Extra photo upload skipped/error:', err.message))
         );
       } else if (!extraPhoto.length) {
@@ -423,19 +438,21 @@ console.log(values,'values')
       }
 
       // Document Front
-      if (documentFront.length && documentFront[0].originFileObj) {
+      const docFrontFile = getFileToUpload(documentFront);
+      if (docFrontFile) {
         uploadPromises.push(
-          uploadFile(`/users/${user.uid}/programs/${programId}/members`, documentFront[0].originFileObj)
-            .then(result => { updatedData.documentFrontURL = result.url; })
+          uploadFile(folderPath, docFrontFile)
+            .then(result => { if (result.url) updatedData.documentFrontURL = result.url; })
             .catch(err => console.warn('Doc front upload skipped/error:', err.message))
         );
       }
 
       // Document Back
-      if (documentBack.length && documentBack[0].originFileObj) {
+      const docBackFile = getFileToUpload(documentBack);
+      if (docBackFile) {
         uploadPromises.push(
-          uploadFile(`/users/${user.uid}/programs/${programId}/members`, documentBack[0].originFileObj)
-            .then(result => { updatedData.documentBackURL = result.url; })
+          uploadFile(folderPath, docBackFile)
+            .then(result => { if (result.url) updatedData.documentBackURL = result.url; })
             .catch(err => console.warn('Doc back upload skipped/error:', err.message))
         );
       } else if (!documentBack.length) {
@@ -443,10 +460,11 @@ console.log(values,'values')
       }
 
       // Guardian Document
-      if (guardianDocument.length && guardianDocument[0].originFileObj) {
+      const guardianDocFile = getFileToUpload(guardianDocument);
+      if (guardianDocFile) {
         uploadPromises.push(
-          uploadFile(`/users/${user.uid}/programs/${programId}/members`, guardianDocument[0].originFileObj)
-            .then(result => { updatedData.guardianDocumentURL = result.url; })
+          uploadFile(folderPath, guardianDocFile)
+            .then(result => { if (result.url) updatedData.guardianDocumentURL = result.url; })
             .catch(err => console.warn('Guardian doc upload skipped/error:', err.message))
         );
       }

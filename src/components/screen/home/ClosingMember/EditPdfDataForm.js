@@ -127,26 +127,39 @@ const EditPdfDataForm = ({ open, onClose, memberData, selectedProgram, onSave, u
 
   // Upload image to Firebase
   const uploadImageToFirebase = async (file, type) => {
+    if (!file) return '';
+    setUploading(true);
     try {
-      setUploading(true);
-      
-      const fileExtension = file.name.split('.').pop();
-      const fileName = `${type}_${memberData.id}_${uuidv4()}.${fileExtension}`;
+      const rawFile = file.originFileObj || file;
+      const fileExtension = file.name ? file.name.split('.').pop() : 'jpg';
+      const fileName = `${type}_${memberData?.id || Date.now()}_${uuidv4()}.${fileExtension}`;
+      const targetUid = user?.uid || 'admin';
+      const programId = selectedProgram?.id || 'default_prog';
       
       const storageRef = ref(
         storage, 
-        `users/${user.uid}/programs/${selectedProgram?.id}/members/${memberData.id}/pdf_images/${fileName}`
+        `users/${targetUid}/programs/${programId}/members/${memberData?.id}/pdf_images/${fileName}`
       );
       
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
+      const uploadPromise = uploadBytes(storageRef, rawFile).then(snap => getDownloadURL(snap.ref));
+      const downloadURL = await new Promise((resolve) => {
+        const timer = setTimeout(() => {
+          console.warn(`EditPdfDataForm: ${type} upload timed out, using local preview`);
+          resolve(imagePreview || '');
+        }, 15000);
+        uploadPromise
+          .then(url => { clearTimeout(timer); resolve(url); })
+          .catch(err => {
+            clearTimeout(timer);
+            console.warn(`EditPdfDataForm: ${type} upload error, using local preview:`, err.message);
+            resolve(imagePreview || '');
+          });
+      });
       
-      message.success(`${type === 'banner' ? 'Banner' : 'Logo'} image uploaded successfully`);
+      if (downloadURL && !downloadURL.startsWith('data:')) {
+        message.success(`${type === 'banner' ? 'Banner' : 'Logo'} image uploaded successfully`);
+      }
       return downloadURL;
-      
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      throw error;
     } finally {
       setUploading(false);
     }

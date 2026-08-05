@@ -97,9 +97,20 @@ const AddAgent = () => {
 
   const uploadFile = async (uid, file, path) => {
     if (!file) return '';
-    const storageRef = ref(storage, `agents/${uid}/${path}/${file.name}`);
-    await uploadBytes(storageRef, file.originFileObj);
-    return await getDownloadURL(storageRef);
+    const fileToUpload = file.originFileObj || file;
+    if (!fileToUpload || typeof fileToUpload !== 'object') return file.url || '';
+    const fileName = file.name || fileToUpload.name || `file_${Date.now()}`;
+    const storageRef = ref(storage, `agents/${uid}/${path}/${Date.now()}_${fileName}`);
+    const uploadPromise = uploadBytes(storageRef, fileToUpload).then(() => getDownloadURL(storageRef));
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        console.warn(`Agent upload ${path} timed out, skipping`);
+        resolve(file.url || '');
+      }, 15000);
+      uploadPromise
+        .then(url => { clearTimeout(timer); resolve(url); })
+        .catch(err => { clearTimeout(timer); console.warn(`Upload agent ${path} warning:`, err.message); resolve(file.url || ''); });
+    });
   };
 
   const sendAgentCredentialsEmail = async (agentData, password) => {

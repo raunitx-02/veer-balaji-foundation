@@ -511,22 +511,36 @@ const ClosingForm = ({ open, onClose, memberData, user, selectedProgram, onSucce
   };
 
   const uploadInvitationCard = async (file) => {
+    if (!file) return '';
+    setUploading(true);
     try {
-      setUploading(true);
-      const fileExtension = file.name.split('.').pop();
-      const fileName = `invitation_${memberData.id}_${uuidv4()}.${fileExtension}`;
+      const rawFile = file.originFileObj || file;
+      const fileExtension = file.name ? file.name.split('.').pop() : 'jpg';
+      const fileName = `invitation_${memberData?.id || Date.now()}_${uuidv4()}.${fileExtension}`;
+      const targetUid = user?.uid || 'admin';
+      const programId = selectedProgram?.id || 'default_prog';
       
       const storageRef = ref(
         storage, 
-        `users/${user.uid}/programs/${selectedProgram?.id}/members/${memberData.id}/invitation_cards/${fileName}`
+        `users/${targetUid}/programs/${programId}/members/${memberData?.id}/invitation_cards/${fileName}`
       );
       
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
+      const uploadPromise = uploadBytes(storageRef, rawFile).then(snap => getDownloadURL(snap.ref));
+      const downloadURL = await new Promise((resolve) => {
+        const timer = setTimeout(() => {
+          console.warn('ClosingForm: invitation card upload timed out, skipping');
+          resolve(existingImageUrl || '');
+        }, 15000);
+        uploadPromise
+          .then(url => { clearTimeout(timer); resolve(url); })
+          .catch(err => {
+            clearTimeout(timer);
+            console.warn('ClosingForm: invitation card upload error, skipping:', err.message);
+            message.warning('Media upload issue - closing details saved without image update.');
+            resolve(existingImageUrl || '');
+          });
+      });
       return downloadURL;
-    } catch (error) {
-      console.error('Error uploading:', error);
-      throw error;
     } finally {
       setUploading(false);
     }

@@ -1431,9 +1431,12 @@ function AddPaymentDrawer({ open, onClose, programId, programName, programList, 
 export default function PaymentPage() {
   const { message } = App.useApp();
   const { user } = useAuth();
-  const programList = useSelector(state => state.data.programList);
-  const selectedProgram = useSelector(state => state.data.selectedProgram);
+  const programList = useSelector(state => state.data.programList) || [];
+  const reduxSelectedProgram = useSelector(state => state.data.selectedProgram);
   const agentList = useSelector(state => state.data.agentsList) || [];
+
+  const [localProgramId, setLocalProgramId] = useState('');
+  const activeProgram = reduxSelectedProgram || programList.find(p => p.id === localProgramId) || programList[0];
 
   const [membersData, setMembersData] = useState([]);
   const [summaryStats, setSummaryStats] = useState({ total: 0, totalAmount: 0, totalPaid: 0, totalPending: 0, membersWithPending: 0 });
@@ -1449,10 +1452,12 @@ export default function PaymentPage() {
   const gridRef = useRef();
 
   const fetchData = useCallback(async () => {
-    if (!selectedProgram || !user) return;
+    if (!activeProgram || !user) return;
     setLoading(true);
     try {
-      const { members, summary } = await fetchPaymentDataAPI(selectedProgram.id);
+      const res = await fetchPaymentDataAPI(activeProgram.id);
+      const members = res?.members || [];
+      const summary = res?.summary || { total: 0, totalAmount: 0, totalPaid: 0, totalPending: 0, membersWithPending: 0 };
       const enriched = members.map((member) => {
         const agentFromList = agentList?.find(a => a.id === member.agentId);
         return {
@@ -1469,10 +1474,11 @@ export default function PaymentPage() {
       } else {
         message.error('Failed to load payment data');
       }
+      setMembersData([]);
     } finally {
       setLoading(false);
     }
-  }, [selectedProgram, user, agentList]);
+  }, [activeProgram, user, agentList]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -1616,11 +1622,23 @@ export default function PaymentPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold text-gray-900 m-0">Payment Management</h1>
-            {selectedProgram && <p className="text-xs text-gray-400 m-0">{selectedProgram.name}</p>}
+            {activeProgram && <p className="text-xs text-gray-400 m-0">{activeProgram.name}</p>}
           </div>
+          {programList.length > 0 && (
+            <Select
+              placeholder="Select Program"
+              value={activeProgram?.id}
+              onChange={(val) => setLocalProgramId(val)}
+              className="min-w-[200px]"
+            >
+              {programList.map(p => (
+                <Option key={p.id} value={p.id}>{p.name}</Option>
+              ))}
+            </Select>
+          )}
         </div>
 
-        {selectedProgram && (
+        {activeProgram && (
           <Row gutter={[10, 10]}>
             {[
               { label: 'Total Members', value: summaryStats.total, color: '#6366f1', bg: '#eef2ff', icon: <TeamOutlined /> },
@@ -1647,7 +1665,7 @@ export default function PaymentPage() {
           </Row>
         )}
 
-        {selectedProgram && (
+        {activeProgram && (
           <div className="bg-white rounded-xl border border-gray-200 px-3 py-2.5 shadow-sm">
             <div className="flex items-center gap-2 flex-wrap">
               <Search placeholder="Search name, reg no, phone..."
@@ -1694,7 +1712,7 @@ export default function PaymentPage() {
           />
         )}
 
-        {selectedProgram ? (
+        {activeProgram ? (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden ag-theme-alpine"
             style={{ height: '65vh', width: '100%' }}>
             <AgGridReact
@@ -1730,8 +1748,8 @@ export default function PaymentPage() {
         open={showBulk}
         onClose={() => setShowBulk(false)}
         selectedRows={selectedRows}
-        programId={selectedProgram?.id}
-        programName={selectedProgram?.name}
+        programId={activeProgram?.id}
+        programName={activeProgram?.name}
         user={user}
         onSuccess={() => {
           fetchData();
@@ -1743,8 +1761,8 @@ export default function PaymentPage() {
       <AddPaymentDrawer
         open={showAddPayment}
         onClose={() => setShowAddPayment(false)}
-        programId={selectedProgram?.id}
-        programName={selectedProgram?.name}
+        programId={activeProgram?.id}
+        programName={activeProgram?.name}
         programList={programList || []}
         user={user}
         onSuccess={fetchData}
@@ -1754,7 +1772,7 @@ export default function PaymentPage() {
         open={!!closingDrawerMember}
         onClose={() => setClosingDrawerMember(null)}
         member={closingDrawerMember}
-        programId={selectedProgram?.id}
+        programId={activeProgram?.id}
         user={user}
       />
     </div>

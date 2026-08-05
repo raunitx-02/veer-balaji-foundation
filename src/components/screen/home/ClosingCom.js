@@ -356,15 +356,31 @@ const ClosingCom = ({ user, selectedProgram }) => {
   };
 
   const uploadInvitationCard = async (file) => {
+    if (!file) return '';
     setUploading(true);
     try {
-      const ext = file.name.split('.').pop();
+      const rawFile = file.originFileObj || file;
+      const ext = file.name ? file.name.split('.').pop() : 'jpg';
+      const targetUid = user?.uid || 'admin';
+      const programId = selectedProgram?.id || 'default_prog';
       const storageRef = ref(
         storage,
-        `users/${user.uid}/programs/${selectedProgram?.id}/members/${selectedRecord.id}/invitation_cards/invitation_${selectedRecord.id}_${uuidv4()}.${ext}`
+        `users/${targetUid}/programs/${programId}/members/${selectedRecord?.id}/invitation_cards/invitation_${selectedRecord?.id}_${uuidv4()}.${ext}`
       );
-      const snap = await uploadBytes(storageRef, file);
-      return await getDownloadURL(snap.ref);
+      const uploadPromise = uploadBytes(storageRef, rawFile).then(snap => getDownloadURL(snap.ref));
+      return await new Promise((resolve) => {
+        const timer = setTimeout(() => {
+          console.warn('ClosingCom: invitation card upload timed out, skipping');
+          resolve(selectedRecord?.invitationCardURL || '');
+        }, 15000);
+        uploadPromise
+          .then(url => { clearTimeout(timer); resolve(url); })
+          .catch(err => {
+            clearTimeout(timer);
+            console.warn('ClosingCom: upload error, skipping:', err.message);
+            resolve(selectedRecord?.invitationCardURL || '');
+          });
+      });
     } finally { setUploading(false); }
   };
 
