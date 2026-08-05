@@ -93,13 +93,13 @@ const SingleMemberCertificate = ({ member, selectedProgram }) => {
 
         {/* DYNAMIC MEMBER OVERLAYS FOR PAGE 1 */}
 
-        {/* 1. Membership Reg Number Box (Top Left: x=17, y=134) */}
-        <View style={{ position: 'absolute', top: 134, left: 17 }}>
+        {/* 1. Membership Reg Number Box (Top Left: x=24, y=134) */}
+        <View style={{ position: 'absolute', top: 134, left: 24 }}>
           <DigitBoxRow value={regNo} count={4} />
         </View>
 
-        {/* 2. Date Box (Top Right: x=457, y=134) */}
-        <View style={{ position: 'absolute', top: 134, left: 457 }}>
+        {/* 2. Date Box (Top Right: x=460, y=134) */}
+        <View style={{ position: 'absolute', top: 134, left: 460 }}>
           <DateBoxRow value={joinDate} />
         </View>
 
@@ -113,54 +113,54 @@ const SingleMemberCertificate = ({ member, selectedProgram }) => {
         </View>
 
         {/* 4. Left Column Personal Details */}
-        {/* Member Name (x=45, y=155) */}
-        <View style={{ position: 'absolute', top: 155, left: 45 }}>
+        {/* Member Name (x=70, y=154) */}
+        <View style={{ position: 'absolute', top: 154, left: 70 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 11, color: '#000' }}>{name}</Text>
         </View>
 
-        {/* Date of Birth (x=80, y=176) */}
-        <View style={{ position: 'absolute', top: 176, left: 80 }}>
+        {/* Date of Birth (x=95, y=172) */}
+        <View style={{ position: 'absolute', top: 172, left: 95 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{dob}</Text>
         </View>
 
-        {/* Mobile Number (x=80, y=196) */}
-        <View style={{ position: 'absolute', top: 196, left: 80 }}>
+        {/* Mobile Number (x=105, y=190) */}
+        <View style={{ position: 'absolute', top: 190, left: 105 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{phone}</Text>
         </View>
 
-        {/* Address (x=45, y=216) */}
-        <View style={{ position: 'absolute', top: 216, left: 45, width: 220 }}>
+        {/* Address (x=50, y=208) */}
+        <View style={{ position: 'absolute', top: 208, left: 50, width: 220 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 9.5, color: '#000' }}>{address}</Text>
         </View>
 
-        {/* Guardian / Hakdar (x=70/80, y=236) */}
-        <View style={{ position: 'absolute', top: 236, left: isMayra ? 70 : 80 }}>
+        {/* Guardian / Hakdar (x=90, y=228) */}
+        <View style={{ position: 'absolute', top: 228, left: isMayra ? 75 : 90 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{guardian}</Text>
         </View>
 
-        {/* Agent Code (x=75, y=256) */}
-        <View style={{ position: 'absolute', top: 256, left: 75 }}>
+        {/* Agent Code (x=95, y=246) */}
+        <View style={{ position: 'absolute', top: 246, left: 95 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{agentCode}</Text>
         </View>
 
         {/* 5. Middle Column Personal Details */}
-        {/* Father / Husband Name (x=335, y=158) */}
-        <View style={{ position: 'absolute', top: 158, left: 335 }}>
+        {/* Father / Husband Name (x=340, y=154) */}
+        <View style={{ position: 'absolute', top: 154, left: 340 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10.5, color: '#000' }}>{fatherName}</Text>
         </View>
 
-        {/* Jati / Surname (x=285, y=178) */}
-        <View style={{ position: 'absolute', top: 178, left: 285 }}>
+        {/* Jati / Surname (x=295, y=172) */}
+        <View style={{ position: 'absolute', top: 172, left: 295 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{jati}</Text>
         </View>
 
-        {/* Aadhaar Number (x=335, y=198) */}
-        <View style={{ position: 'absolute', top: 198, left: 335 }}>
+        {/* Aadhaar Number (x=335, y=190) */}
+        <View style={{ position: 'absolute', top: 190, left: 335 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{aadhaar}</Text>
         </View>
 
-        {/* Relation (x=305, y=236) */}
-        <View style={{ position: 'absolute', top: 236, left: 305 }}>
+        {/* Relation (x=315, y=228) */}
+        <View style={{ position: 'absolute', top: 228, left: 315 }}>
           <Text style={{ fontFamily: 'NSD', fontWeight: 'bold', fontSize: 10, color: '#000' }}>{relation}</Text>
         </View>
 
