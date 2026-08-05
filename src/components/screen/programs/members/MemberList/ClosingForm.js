@@ -381,9 +381,15 @@ const ClosingForm = ({ open, onClose, memberData, user, selectedProgram, onSucce
       }
 
       // Update member document
+      const targetUid = user?.uid || 'admin';
+      const programId = selectedProgram?.id || memberData?.programId;
       const memberRef = doc(
         db, 
-        `users/${user.uid}/programs/${selectedProgram?.id}/members`, 
+        'users',
+        targetUid,
+        'programs',
+        programId,
+        'members',
         memberData.id
       );
       

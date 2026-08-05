@@ -418,9 +418,15 @@ const handleDateOfBirthChange = (date) => {
       if (photoFile) {
         uploadPromises.push(
           uploadFile(folderPath, photoFile)
-            .then(result => { if (result.url) updatedData.photoURL = result.url; })
+            .then(result => { 
+              if (result && result.url) {
+                updatedData.photoURL = result.url;
+              }
+            })
             .catch(err => console.warn('Photo upload skipped/error:', err.message))
         );
+      } else if (photo.length && photo[0].url) {
+        updatedData.photoURL = photo[0].url;
       } else if (!photo.length) {
         updatedData.photoURL = '';
       }
@@ -430,9 +436,15 @@ const handleDateOfBirthChange = (date) => {
       if (extraPhotoFile) {
         uploadPromises.push(
           uploadFile(folderPath, extraPhotoFile)
-            .then(result => { if (result.url) updatedData.extraImageURL = result.url; })
+            .then(result => { 
+              if (result && result.url) {
+                updatedData.extraImageURL = result.url;
+              }
+            })
             .catch(err => console.warn('Extra photo upload skipped/error:', err.message))
         );
+      } else if (extraPhoto.length && extraPhoto[0].url) {
+        updatedData.extraImageURL = extraPhoto[0].url;
       } else if (!extraPhoto.length) {
         updatedData.extraImageURL = '';
       }
@@ -442,9 +454,15 @@ const handleDateOfBirthChange = (date) => {
       if (docFrontFile) {
         uploadPromises.push(
           uploadFile(folderPath, docFrontFile)
-            .then(result => { if (result.url) updatedData.documentFrontURL = result.url; })
+            .then(result => { 
+              if (result && result.url) {
+                updatedData.documentFrontURL = result.url;
+              }
+            })
             .catch(err => console.warn('Doc front upload skipped/error:', err.message))
         );
+      } else if (documentFront.length && documentFront[0].url) {
+        updatedData.documentFrontURL = documentFront[0].url;
       }
 
       // Document Back
@@ -452,9 +470,15 @@ const handleDateOfBirthChange = (date) => {
       if (docBackFile) {
         uploadPromises.push(
           uploadFile(folderPath, docBackFile)
-            .then(result => { if (result.url) updatedData.documentBackURL = result.url; })
+            .then(result => { 
+              if (result && result.url) {
+                updatedData.documentBackURL = result.url;
+              }
+            })
             .catch(err => console.warn('Doc back upload skipped/error:', err.message))
         );
+      } else if (documentBack.length && documentBack[0].url) {
+        updatedData.documentBackURL = documentBack[0].url;
       } else if (!documentBack.length) {
         updatedData.documentBackURL = '';
       }
@@ -464,9 +488,15 @@ const handleDateOfBirthChange = (date) => {
       if (guardianDocFile) {
         uploadPromises.push(
           uploadFile(folderPath, guardianDocFile)
-            .then(result => { if (result.url) updatedData.guardianDocumentURL = result.url; })
+            .then(result => { 
+              if (result && result.url) {
+                updatedData.guardianDocumentURL = result.url;
+              }
+            })
             .catch(err => console.warn('Guardian doc upload skipped/error:', err.message))
         );
+      } else if (guardianDocument.length && guardianDocument[0].url) {
+        updatedData.guardianDocumentURL = guardianDocument[0].url;
       }
 
       // Wait for all uploads
