@@ -99,17 +99,37 @@ const AddAgent = () => {
     if (!file) return '';
     const fileToUpload = file.originFileObj || file;
     if (!fileToUpload || typeof fileToUpload !== 'object') return file.url || '';
+    
+    const getDataUrl = () => new Promise((res) => {
+      if (!(fileToUpload instanceof Blob || fileToUpload instanceof File)) {
+        res(file.url || '');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result);
+      reader.onerror = () => res(file.url || '');
+      reader.readAsDataURL(fileToUpload);
+    });
+
     const fileName = file.name || fileToUpload.name || `file_${Date.now()}`;
     const storageRef = ref(storage, `agents/${uid}/${path}/${Date.now()}_${fileName}`);
     const uploadPromise = uploadBytes(storageRef, fileToUpload).then(() => getDownloadURL(storageRef));
-    return new Promise((resolve) => {
-      const timer = setTimeout(() => {
-        console.warn(`Agent upload ${path} timed out, skipping`);
-        resolve(file.url || '');
-      }, 15000);
+    
+    return new Promise(async (resolve) => {
+      const timer = setTimeout(async () => {
+        console.warn(`Agent upload ${path} timed out, using fallback`);
+        const fallback = await getDataUrl();
+        resolve(fallback);
+      }, 12000);
+
       uploadPromise
         .then(url => { clearTimeout(timer); resolve(url); })
-        .catch(err => { clearTimeout(timer); console.warn(`Upload agent ${path} warning:`, err.message); resolve(file.url || ''); });
+        .catch(async err => {
+          clearTimeout(timer);
+          console.warn(`Upload agent ${path} warning:`, err.message);
+          const fallback = await getDataUrl();
+          resolve(fallback);
+        });
     });
   };
 

@@ -26,9 +26,6 @@ function withTimeout(promise, ms = 15000, fallback = null) {
     });
 }
 
-/* ------------------------------------------
-   1. Upload file and return download URL
-------------------------------------------- */
 export async function uploadFile(folderName, file) {
     if (!file) return { url: '', path: '' };
     const rawFile = file.originFileObj || file;
@@ -37,12 +34,34 @@ export async function uploadFile(folderName, file) {
     const cleanFolder = (folderName || 'uploads').replace(/^\/+|\/+$/g, '');
     const fileRef = ref(storage, `${cleanFolder}/${Date.now()}_${fileName}`);
 
-    const uploadPromise = uploadBytes(fileRef, rawFile)
-        .then(() => getDownloadURL(fileRef))
-        .then(url => ({ url, path: fileRef.fullPath }));
+    // Convert to DataURL helper for immediate visual fallback if Firebase Storage fails
+    const getDataUrl = () => new Promise((res) => {
+        if (!(rawFile instanceof Blob || rawFile instanceof File)) {
+            res(file?.url || '');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result);
+        reader.onerror = () => res(file?.url || '');
+        reader.readAsDataURL(rawFile);
+    });
 
-    const result = await withTimeout(uploadPromise, 15000, { url: file?.url || '', path: fileRef.fullPath, timedOut: true });
-    return result;
+    try {
+        const uploadPromise = uploadBytes(fileRef, rawFile)
+            .then(() => getDownloadURL(fileRef))
+            .then(url => ({ url, path: fileRef.fullPath }));
+
+        const result = await withTimeout(uploadPromise, 15000, null);
+        if (result && result.url) {
+            return result;
+        }
+        const fallbackUrl = await getDataUrl();
+        return { url: fallbackUrl, path: fileRef.fullPath, fallback: true };
+    } catch (err) {
+        console.warn('storageService.uploadFile fallback used:', err?.message);
+        const fallbackUrl = await getDataUrl();
+        return { url: fallbackUrl, path: fileRef.fullPath, fallback: true };
+    }
 }
 
 /* ------------------------------------------
