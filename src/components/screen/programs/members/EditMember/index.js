@@ -633,7 +633,7 @@ const handleDateOfBirthChange = (date) => {
           </Space>
         }
       >
-        {loading ? (
+        {false ? (
           <div className='min-h-[50vh] w-full flex flex-col items-center justify-center'>
             <Spin spinning={loading} size="large" />
             <div style={{ marginTop: 16 }}>

@@ -386,12 +386,10 @@ const AgentManagement = ({ agentData = null, mode = 'add', onSuccess,isAgentDraw
         }
       >
         <div className="bg-gray-50 rounded-lg p-4">
-          {(loading || initialLoading) ? (
+          {initialLoading ? (
             <div className="h-96 flex flex-col items-center justify-center">
               <Spin size="large" />
-              <p className="text-gray-600 mt-4 font-medium">
-                {initialLoading ? 'Loading agent data...' : `${isEditMode ? 'Updating' : 'Creating'} agent account...`}
-              </p>
+              <p className="text-gray-600 mt-4 font-medium">Loading agent data...</p>
               <p className="text-gray-400 text-sm mt-2">Please wait while we set everything up</p>
             </div>
           ) : (
