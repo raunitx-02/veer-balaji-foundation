@@ -17,6 +17,7 @@
     "ag-grid-react": "^34.3.1",
     "antd": "^5.28.1",
     "antd-img-crop": "^4.27.0",
+    "canvas": "^3.2.3",
     "firebase": "^12.6.0",
     "firebase-admin": "^13.6.0",
     "google-auth-library": "^10.5.0",
