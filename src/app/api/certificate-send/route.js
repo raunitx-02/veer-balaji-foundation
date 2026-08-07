@@ -181,6 +181,16 @@ export async function POST(req) {
       ctx.fillText(aadhaar,    1140, 836);
       ctx.fillText(relation,   1030, 968);
 
+      // 7. Contribution Amount Overlay (सहयोग राशि -............/- प्रत्येक कार्यक्रम पर लागू)
+      const payAmountVal = member?.payAmount || member?.paymentAmount || selectedProgram?.payAmount || 0;
+      if (payAmountVal) {
+        ctx.fillStyle = "#942626"; // Matching maroon header theme
+        ctx.font = 'bold 38px "NSDBold"';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(String(payAmountVal), 415, 1122);
+      }
+
       // Convert composite canvas to PNG Buffer
       const p1PngBuffer = canvas.toBuffer("image/png");
 
