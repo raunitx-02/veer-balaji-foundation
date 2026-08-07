@@ -184,13 +184,9 @@ export async function POST(req) {
       // Convert composite canvas to PNG Buffer
       const p1PngBuffer = canvas.toBuffer("image/png");
 
-      // PAGE 1 — 100% Exact Canva background + dynamic text overlay
+      // PAGE 1 ONLY — 100% Exact Canva background + dynamic text overlay
       doc.addPage({ size: [841.89, 595.28], margin: 0 });
       doc.image(p1PngBuffer, 0, 0, { width: 841.89, height: 595.28 });
-
-      // PAGE 2 — 100% Exact Canva Terms & Conditions background
-      doc.addPage({ size: [841.89, 595.28], margin: 0 });
-      doc.image(bg2Path, 0, 0, { width: 841.89, height: 595.28 });
     }
 
     doc.end();
