@@ -109,22 +109,31 @@ export async function POST(req) {
         if (clean.length === 8) dateStr = clean;
       }
 
-      // 3. Reg boxes (top left: 50, 612)
-      ctx.font = 'bold 30px "NSDBold"';
+      // 3. Reg boxes (4 boxes: x=50..106, 106..173, 173..240, 240..296)
+      ctx.font = 'bold 36px "NSDBold"';
       ctx.fillStyle = "#000000";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const regCenters = [78, 139, 206, 268];
+      regNo.split("").forEach((ch, i) => {
+        if (regCenters[i]) {
+          ctx.fillText(ch, regCenters[i], 621);
+        }
+      });
+
+      // 4. Date boxes (3 sub-boxes: DD [1538..1638], MM [1638..1756], YYYY [1756..1933])
+      ctx.font = 'bold 32px "NSDBold"';
+      const dateCenters = [1563, 1613, 1668, 1726, 1778, 1822, 1866, 1910];
+      dateStr.split("").forEach((ch, i) => {
+        if (ch.trim() && dateCenters[i]) {
+          ctx.fillText(ch, dateCenters[i], 621);
+        }
+      });
+
+      // Reset alignment for field text
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
-
-      regNo.split("").forEach((ch, i) => {
-        const x = 50 + i * (44 + 4) + 14;
-        ctx.fillText(ch, x, 612);
-      });
-
-      // 4. Date boxes (top right: 1592, 614)
-      dateStr.split("").forEach((ch, i) => {
-        const x = 1592 + i * (36 + 4) + 10;
-        if (ch.trim()) ctx.fillText(ch, x, 614);
-      });
 
       // 5. Member Photo
       if (photoURL) {
