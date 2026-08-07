@@ -109,7 +109,7 @@ export async function POST(req) {
         if (clean.length === 8) dateStr = clean;
       }
 
-      // 3. Reg boxes (top left: 50, 446)
+      // 3. Reg boxes (top left: 50, 612)
       ctx.font = 'bold 30px "NSDBold"';
       ctx.fillStyle = "#000000";
       ctx.textAlign = "left";
@@ -117,13 +117,13 @@ export async function POST(req) {
 
       regNo.split("").forEach((ch, i) => {
         const x = 50 + i * (44 + 4) + 14;
-        ctx.fillText(ch, x, 446);
+        ctx.fillText(ch, x, 612);
       });
 
-      // 4. Date boxes (top right: 1592, 448)
+      // 4. Date boxes (top right: 1592, 614)
       dateStr.split("").forEach((ch, i) => {
         const x = 1592 + i * (36 + 4) + 10;
-        if (ch.trim()) ctx.fillText(ch, x, 448);
+        if (ch.trim()) ctx.fillText(ch, x, 614);
       });
 
       // 5. Member Photo
@@ -144,7 +144,7 @@ export async function POST(req) {
           }
 
           if (photoImg) {
-            ctx.drawImage(photoImg, 1630, 575, 290, 318);
+            ctx.drawImage(photoImg, 1630, 695, 290, 318);
           }
         } catch (e) {
           console.error("Photo load error:", e.message);
@@ -154,23 +154,23 @@ export async function POST(req) {
       // 6. Text Overlays (Exact fit for Canva dotted lines)
       ctx.fillStyle = "#111111";
 
-      ctx.font = 'bold 35px "NSDBold"';
-      ctx.fillText(name,       200, 490);
-      ctx.fillText(dob,        290, 556);
-      ctx.fillText(phone,      290, 622);
+      ctx.font = 'bold 34px "NSDBold"';
+      ctx.fillText(name,       200, 704);
+      ctx.fillText(dob,        290, 770);
+      ctx.fillText(phone,      290, 836);
 
       ctx.font = 'bold 30px "NSDBold"';
-      ctx.fillText(fullAddr,   150, 688);
+      ctx.fillText(fullAddr,   150, 902);
 
-      ctx.font = 'bold 35px "NSDBold"';
-      ctx.fillText(guardian,   270, 754);
-      ctx.fillText(agCode,     270, 820);
+      ctx.font = 'bold 34px "NSDBold"';
+      ctx.fillText(guardian,   270, 968);
+      ctx.fillText(agCode,     270, 1034);
 
       // Right column
-      ctx.fillText(fatherName, 1140, 490);
-      ctx.fillText(gotra,      990,  556);
-      ctx.fillText(aadhaar,    1140, 622);
-      ctx.fillText(relation,   1030, 754);
+      ctx.fillText(fatherName, 1140, 704);
+      ctx.fillText(gotra,      990,  770);
+      ctx.fillText(aadhaar,    1140, 836);
+      ctx.fillText(relation,   1030, 968);
 
       // Convert composite canvas to PNG Buffer
       const p1PngBuffer = canvas.toBuffer("image/png");
