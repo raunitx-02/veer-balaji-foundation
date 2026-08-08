@@ -122,10 +122,13 @@ export async function POST(req) {
       const regNo      = String(regNoRaw).replace(/\D/g, "").padStart(4, "0").slice(-4);
       const joinDate   = member?.dateJoin || "";
 
-      let dateStr = "        ";
+      let dateStrWithSlashes = "";
       if (joinDate) {
         const clean = joinDate.replace(/[^0-9]/g, "");
-        if (clean.length === 8) dateStr = clean;
+        if (clean.length === 8) {
+          // DD/MM/YYYY format
+          dateStrWithSlashes = `${clean.slice(0, 2)}/${clean.slice(2, 4)}/${clean.slice(4)}`;
+        }
       }
 
       // 3. Reg boxes (X centers: 75, 136, 203, 265, Y center: 556)
@@ -141,10 +144,10 @@ export async function POST(req) {
         }
       });
 
-      // 4. Date boxes (Separated into DD [1542..1638], MM [1638..1756], YYYY [1756..1941])
+      // 4. Date box with slashes: DD / MM / YYYY (X centers: 1565, 1605, 1640, 1675, 1715, 1750, 1785, 1825, 1865, 1905)
       ctx.font = 'bold 30px "NSDBold"';
-      const calcDateCenters = [1565, 1615, 1672, 1722, 1780, 1825, 1870, 1915];
-      dateStr.split("").forEach((ch, i) => {
+      const calcDateCenters = [1565, 1605, 1640, 1675, 1715, 1750, 1785, 1825, 1865, 1905];
+      dateStrWithSlashes.split("").forEach((ch, i) => {
         if (ch.trim() && calcDateCenters[i]) {
           ctx.fillText(ch, calcDateCenters[i], 550);
         }
