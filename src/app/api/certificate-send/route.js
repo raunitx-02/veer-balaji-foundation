@@ -31,9 +31,9 @@ export async function POST(req) {
       );
     }
 
-    const fontPath = path.join(process.cwd(), "public/static/font/NotoSansDevanagari-Bold.ttf");
+    const fontPath = path.join(process.cwd(), "public/static/font/AnekDevanagari-Bold.ttf");
     try {
-      registerFont(fontPath, { family: "NSDBold" });
+      registerFont(fontPath, { family: "AnekDevanagariBold" });
     } catch (e) {
       // Font may already be registered across requests
     }
@@ -97,6 +97,8 @@ export async function POST(req) {
       const guardian     = member?.guardian || "";
       const relation     = member?.guardianRelation || "";
       const agCode       = member?.agentCode || member?.agentId || "";
+      const agName       = member?.agentName || member?.agent || "";
+      const agentDisplay = agName ? (agCode ? `${agName} (${agCode})` : agName) : agCode;
       const photoURL     = member?.photoURL || null;
       const guardianAadhaar = member?.guardianAadhaar || member?.warisAadhaar || "";
       const noteInfo     = programName;
@@ -132,7 +134,7 @@ export async function POST(req) {
       }
 
       // 3. Reg boxes (X centers: 75, 136, 203, 265, Y center: 556)
-      ctx.font = 'bold 36px "NSDBold"';
+      ctx.font = 'bold 36px "AnekDevanagariBold"';
       ctx.fillStyle = "#000000";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -145,7 +147,7 @@ export async function POST(req) {
       });
 
       // 4. Date box with slashes: DD / MM / YYYY (X centers: 1565, 1605, 1640, 1675, 1715, 1750, 1785, 1825, 1865, 1905)
-      ctx.font = 'bold 30px "NSDBold"';
+      ctx.font = 'bold 32px "AnekDevanagariBold"';
       const calcDateCenters = [1565, 1605, 1640, 1675, 1715, 1750, 1785, 1825, 1865, 1905];
       dateStrWithSlashes.split("").forEach((ch, i) => {
         if (ch.trim() && calcDateCenters[i]) {
@@ -182,32 +184,37 @@ export async function POST(req) {
         }
       }
 
-      // 6. Text Overlays (New Template Layout)
+      // 6. Text Overlays (Anek Devanagari 38px Font)
       ctx.fillStyle = "#111111";
-      ctx.font = 'bold 32px "NSDBold"';
+      ctx.font = 'bold 38px "AnekDevanagariBold"';
 
       const payAmountVal = member?.payAmount || member?.paymentAmount || selectedProgram?.payAmount || "";
       const kishtStr = payAmountVal ? `${payAmountVal}` : "";
 
       // Left Column
-      ctx.fillText(name,       220, 652);
-      ctx.fillText(fatherName, 485, 712);
-      ctx.fillText(phone,      330, 780);
-      ctx.fillText(guardian,   280, 850);
-      ctx.fillText(gotra,      190, 915);
-      ctx.fillText(village,    170, 980);
-      ctx.fillText(kishtStr,   180, 1045);
-      ctx.fillText(noteInfo,   290, 1110);
+      ctx.fillText(name,       220, 650);
+      ctx.fillText(fatherName, 485, 710);
+      ctx.fillText(phone,      330, 778);
+      ctx.fillText(guardian,   280, 848);
+      ctx.fillText(gotra,      190, 913);
+      ctx.fillText(village,    170, 978);
+      ctx.fillText(kishtStr,   180, 1043);
+      ctx.fillText(noteInfo,   290, 1108);
 
       // Middle Column
-      ctx.fillText(dob,             1150, 636);
-      ctx.fillText(aadhaar,         1140, 700);
-      ctx.fillText(ageStr,          1020, 759);
-      ctx.fillText(guardianAadhaar, 1260, 809);
-      ctx.fillText(relation,        1040, 870);
-      ctx.fillText(village,         1220, 935);
-      ctx.fillText(stateDistrict,   1200, 1000);
-      ctx.fillText(agCode,          1150, 1065);
+      ctx.fillText(dob,             1150, 634);
+      ctx.fillText(aadhaar,         1140, 698);
+      ctx.fillText(ageStr,          1020, 757);
+      ctx.fillText(guardianAadhaar, 1260, 807);
+      ctx.fillText(relation,        1040, 868);
+      ctx.fillText(village,         1220, 933);
+      ctx.fillText(stateDistrict,   1200, 998);
+      ctx.fillText(agCode,          1150, 1063);
+
+      // 7. Worker Signature Area (Above कार्यकर्ता)
+      if (agentDisplay) {
+        ctx.fillText(agentDisplay, 120, 1260);
+      }
 
       // Convert composite canvas to PNG Buffer
       const p1PngBuffer = canvas.toBuffer("image/png");
