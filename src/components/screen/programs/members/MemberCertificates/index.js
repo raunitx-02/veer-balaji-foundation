@@ -15,12 +15,13 @@ const MemberCertificateCom = ({
   const reduxProgram = useSelector((state) => state.data.selectedProgram);
   const agentList = useSelector((state) => state.data.agentsList || []);
 
-  const memberAgent = (agentList || []).find((x) => x.id === memberData?.agentId);
+  const memberAgent = (agentList || []).find((x) => x.id === memberData?.agentId || x.agentCode === memberData?.agentCode);
   const fullMemberData = memberData
     ? {
         ...memberData,
-        agentPhone: memberAgent?.phone,
-        agentCode: memberAgent?.agentCode || memberData?.agentCode,
+        agentName: memberAgent?.displayName || memberAgent?.name || memberData?.addedByName || memberData?.agentName || '',
+        agentPhone: memberAgent?.phone || memberData?.agentPhone,
+        agentCode: memberAgent?.agentCode || memberData?.agentCode || memberData?.agentId,
       }
     : null;
 

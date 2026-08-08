@@ -97,8 +97,15 @@ export async function POST(req) {
       const guardian     = member?.guardian || "";
       const relation     = member?.guardianRelation || "";
       const agCode       = member?.agentCode || member?.agentId || "";
-      const agName       = member?.agentName || member?.agent || "";
-      const agentDisplay = agName ? (agCode ? `${agName} (${agCode})` : agName) : agCode;
+      const agName       = member?.agentName || member?.addedByName || member?.agent || "";
+      let agentDisplay = "";
+      if (agName && agCode) {
+        agentDisplay = `${agName} (${agCode})`;
+      } else if (agName) {
+        agentDisplay = agName;
+      } else if (agCode) {
+        agentDisplay = `एजेंट (${agCode})`;
+      }
       const photoURL     = member?.photoURL || null;
       const guardianAadhaar = member?.guardianAadhaar || member?.warisAadhaar || "";
       const noteInfo     = programName;

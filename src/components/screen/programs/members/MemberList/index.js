@@ -470,11 +470,15 @@ const MemberList = () => {
         setIsCertDownloading(true);
         const loadingMessage = message.loading('Generating certificates, please wait...', 0);
 
-        const membersData = membersArray.map(member => ({
-            ...member,
-            agentPhone: agentsList?.find(a => a.id === member.agentId)?.phone || 'N/A',
-            agentCode: agentsList?.find(a => a.id === member.agentId)?.agentCode
-        }));
+        const membersData = membersArray.map(member => {
+            const foundAgent = agentsList?.find(a => a.id === member.agentId || a.agentCode === member.agentCode || a.agentId === member.agentId);
+            return {
+                ...member,
+                agentName: foundAgent?.displayName || foundAgent?.name || member.addedByName || member.agentName || '',
+                agentPhone: foundAgent?.phone || member.agentPhone || 'N/A',
+                agentCode: foundAgent?.agentCode || member.agentCode || member.agentId || ''
+            };
+        });
 
         try {
             const response = await fetch('/api/certificate-send', {
