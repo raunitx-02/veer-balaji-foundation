@@ -187,24 +187,24 @@ export async function POST(req) {
       const kishtStr = payAmountVal ? `${payAmountVal}` : "";
 
       // Left Column
-      ctx.fillText(name,       180, 652);
-      ctx.fillText(fatherName, 385, 712);
-      ctx.fillText(phone,      290, 780);
-      ctx.fillText(guardian,   250, 850);
-      ctx.fillText(gotra,      160, 915);
-      ctx.fillText(village,    140, 980);
-      ctx.fillText(kishtStr,   150, 1045);
-      ctx.fillText(noteInfo,   260, 1110);
+      ctx.fillText(name,       220, 652);
+      ctx.fillText(fatherName, 485, 712);
+      ctx.fillText(phone,      330, 780);
+      ctx.fillText(guardian,   280, 850);
+      ctx.fillText(gotra,      190, 915);
+      ctx.fillText(village,    170, 980);
+      ctx.fillText(kishtStr,   180, 1045);
+      ctx.fillText(noteInfo,   290, 1110);
 
       // Middle Column
-      ctx.fillText(dob,             1120, 636);
-      ctx.fillText(aadhaar,         1110, 700);
-      ctx.fillText(ageStr,          1000, 759);
-      ctx.fillText(guardianAadhaar, 1220, 809);
-      ctx.fillText(relation,        1030, 870);
-      ctx.fillText(village,         1190, 935);
-      ctx.fillText(stateDistrict,   1170, 1000);
-      ctx.fillText(agCode,          1130, 1065);
+      ctx.fillText(dob,             1150, 636);
+      ctx.fillText(aadhaar,         1140, 700);
+      ctx.fillText(ageStr,          1020, 759);
+      ctx.fillText(guardianAadhaar, 1260, 809);
+      ctx.fillText(relation,        1040, 870);
+      ctx.fillText(village,         1220, 935);
+      ctx.fillText(stateDistrict,   1200, 1000);
+      ctx.fillText(agCode,          1150, 1065);
 
       // Convert composite canvas to PNG Buffer
       const p1PngBuffer = canvas.toBuffer("image/png");
