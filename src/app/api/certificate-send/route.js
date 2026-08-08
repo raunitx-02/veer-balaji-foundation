@@ -85,19 +85,38 @@ export async function POST(req) {
       ctx.drawImage(bg1, 0, 0, 2000, 1414);
 
       // 2. Extract fields
-      const name       = member?.displayName || member?.name || "";
-      const fatherName = member?.fatherName || "";
-      const dob        = member?.bobDate || member?.dob || "";
-      const phone      = member?.phone || member?.mobile || "";
-      const aadhaar    = member?.aadhaarNo || "";
-      const gotra      = member?.gotra || member?.jati || "";
-      const address    = member?.currentAddress || member?.address || "";
-      const village    = member?.village || "";
-      const fullAddr   = [address, village].filter(Boolean).join(", ");
-      const guardian   = member?.guardian || "";
-      const relation   = member?.guardianRelation || "";
-      const agCode     = member?.agentCode || member?.agentId || "";
-      const photoURL   = member?.photoURL || null;
+      const name         = member?.displayName || member?.name || "";
+      const fatherName   = member?.fatherName || "";
+      const dob          = member?.bobDate || member?.dob || "";
+      const phone        = member?.phone || member?.mobile || "";
+      const aadhaar      = member?.aadhaarNo || "";
+      const gotra        = member?.gotra || member?.jati || "";
+      const address      = member?.currentAddress || member?.address || "";
+      const village      = member?.village || "";
+      const stateDistrict= [member?.district, member?.state].filter(Boolean).join(", ");
+      const guardian     = member?.guardian || "";
+      const relation     = member?.guardianRelation || "";
+      const agCode       = member?.agentCode || member?.agentId || "";
+      const photoURL     = member?.photoURL || null;
+      const guardianAadhaar = member?.guardianAadhaar || member?.warisAadhaar || "";
+      const noteInfo     = programName;
+
+      // Age calculation
+      let ageStr = "";
+      if (member?.age) {
+        ageStr = `${member.age} वर्ष`;
+      } else if (dob) {
+        try {
+          const parts = dob.split("-");
+          if (parts.length === 3) {
+            const birthYear = parseInt(parts[2], 10);
+            const currentYear = new Date().getFullYear();
+            if (birthYear > 1900 && birthYear <= currentYear) {
+              ageStr = `${currentYear - birthYear} वर्ष`;
+            }
+          }
+        } catch (e) {}
+      }
 
       const regNoRaw   = member?.registrationNumber || member?.applicationNumber || "0000";
       const regNo      = String(regNoRaw).replace(/\D/g, "").padStart(4, "0").slice(-4);
@@ -109,25 +128,25 @@ export async function POST(req) {
         if (clean.length === 8) dateStr = clean;
       }
 
-      // 3. Reg boxes (4 boxes: x=50..106, 106..173, 173..240, 240..296)
+      // 3. Reg boxes (X centers: 75, 136, 203, 265, Y center: 556)
       ctx.font = 'bold 36px "NSDBold"';
       ctx.fillStyle = "#000000";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      const regCenters = [78, 139, 206, 268];
+      const regCenters = [75, 136, 203, 265];
       regNo.split("").forEach((ch, i) => {
         if (regCenters[i]) {
-          ctx.fillText(ch, regCenters[i], 621);
+          ctx.fillText(ch, regCenters[i], 556);
         }
       });
 
-      // 4. Date boxes (3 sub-boxes: DD [1538..1638], MM [1638..1756], YYYY [1756..1933])
-      ctx.font = 'bold 32px "NSDBold"';
-      const dateCenters = [1563, 1613, 1668, 1726, 1778, 1822, 1866, 1910];
+      // 4. Date boxes (X centers across 399px width, Y center: 550)
+      ctx.font = 'bold 30px "NSDBold"';
+      const calcDateCenters = [1566, 1616, 1666, 1716, 1766, 1816, 1866, 1916];
       dateStr.split("").forEach((ch, i) => {
-        if (ch.trim() && dateCenters[i]) {
-          ctx.fillText(ch, dateCenters[i], 621);
+        if (ch.trim() && calcDateCenters[i]) {
+          ctx.fillText(ch, calcDateCenters[i], 550);
         }
       });
 
@@ -135,7 +154,7 @@ export async function POST(req) {
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
 
-      // 5. Member Photo
+      // 5. Member Photo (Inner Frame: X=1612, Y=649, W=312, H=368)
       if (photoURL) {
         try {
           let photoImg;
@@ -153,43 +172,39 @@ export async function POST(req) {
           }
 
           if (photoImg) {
-            ctx.drawImage(photoImg, 1630, 695, 290, 318);
+            ctx.drawImage(photoImg, 1612, 649, 312, 368);
           }
         } catch (e) {
           console.error("Photo load error:", e.message);
         }
       }
 
-      // 6. Text Overlays (Exact fit for Canva dotted lines)
+      // 6. Text Overlays (New Template Layout)
       ctx.fillStyle = "#111111";
+      ctx.font = 'bold 32px "NSDBold"';
 
-      ctx.font = 'bold 34px "NSDBold"';
-      ctx.fillText(name,       200, 704);
-      ctx.fillText(dob,        290, 770);
-      ctx.fillText(phone,      290, 836);
+      const payAmountVal = member?.payAmount || member?.paymentAmount || selectedProgram?.payAmount || "";
+      const kishtStr = payAmountVal ? `${payAmountVal}` : "";
 
-      ctx.font = 'bold 30px "NSDBold"';
-      ctx.fillText(fullAddr,   150, 902);
+      // Left Column
+      ctx.fillText(name,       180, 652);
+      ctx.fillText(fatherName, 385, 712);
+      ctx.fillText(phone,      290, 780);
+      ctx.fillText(guardian,   250, 850);
+      ctx.fillText(gotra,      160, 915);
+      ctx.fillText(village,    140, 980);
+      ctx.fillText(kishtStr,   150, 1045);
+      ctx.fillText(noteInfo,   260, 1110);
 
-      ctx.font = 'bold 34px "NSDBold"';
-      ctx.fillText(guardian,   270, 968);
-      ctx.fillText(agCode,     270, 1034);
-
-      // Right column
-      ctx.fillText(fatherName, 1140, 704);
-      ctx.fillText(gotra,      990,  770);
-      ctx.fillText(aadhaar,    1140, 836);
-      ctx.fillText(relation,   1030, 968);
-
-      // 7. Contribution Amount Overlay (सहयोग राशि -............/- प्रत्येक कार्यक्रम पर लागू)
-      const payAmountVal = member?.payAmount || member?.paymentAmount || selectedProgram?.payAmount || 0;
-      if (payAmountVal) {
-        ctx.fillStyle = "#942626"; // Matching maroon header theme
-        ctx.font = 'bold 38px "NSDBold"';
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(String(payAmountVal), 415, 1122);
-      }
+      // Middle Column
+      ctx.fillText(dob,             1120, 636);
+      ctx.fillText(aadhaar,         1110, 700);
+      ctx.fillText(ageStr,          1000, 759);
+      ctx.fillText(guardianAadhaar, 1220, 809);
+      ctx.fillText(relation,        1030, 870);
+      ctx.fillText(village,         1190, 935);
+      ctx.fillText(stateDistrict,   1170, 1000);
+      ctx.fillText(agCode,          1130, 1065);
 
       // Convert composite canvas to PNG Buffer
       const p1PngBuffer = canvas.toBuffer("image/png");
