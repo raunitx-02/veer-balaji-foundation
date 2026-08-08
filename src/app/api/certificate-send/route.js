@@ -141,9 +141,9 @@ export async function POST(req) {
         }
       });
 
-      // 4. Date boxes (X centers across 399px width, Y center: 550)
+      // 4. Date boxes (Separated into DD [1542..1638], MM [1638..1756], YYYY [1756..1941])
       ctx.font = 'bold 30px "NSDBold"';
-      const calcDateCenters = [1566, 1616, 1666, 1716, 1766, 1816, 1866, 1916];
+      const calcDateCenters = [1565, 1615, 1672, 1722, 1780, 1825, 1870, 1915];
       dateStr.split("").forEach((ch, i) => {
         if (ch.trim() && calcDateCenters[i]) {
           ctx.fillText(ch, calcDateCenters[i], 550);
